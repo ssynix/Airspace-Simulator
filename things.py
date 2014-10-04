@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 16:36:23
+# @Last Modified time: 2014-10-04 16:39:04
 
 
 class Vector:
@@ -31,6 +31,7 @@ class Plane:
         self.position = Vector(x, y, altitude)
 
     def setCourse(self, x, y, altitude, time):
+        self.destination = Vector(x,y,altitude)
         self.speed = (Vector(x, y, altitude) - self.position) / time
 
     def flyAway(self):
