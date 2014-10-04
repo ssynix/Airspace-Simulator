@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 14:36:09
+# @Last Modified time: 2014-10-04 15:04:36
 
 #/usr/bin/env python
 """
@@ -59,13 +59,12 @@ class PlaneSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
         self.image, self.rect = load_image('fist.bmp', -1)
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
-        self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 440.)
+        self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
     def update(self):
         "move the fist based on the mouse position"
         newPos = self.plane.flyAway()
         self.rect.midtop = (newPos.x, newPos.y)
-
 
 def main():
     """this function is called when the program starts.
