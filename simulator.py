@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 15:23:51
+# @Last Modified time: 2014-10-04 15:26:14
 
 #/usr/bin/env python
 """
@@ -21,6 +21,8 @@ from things import Plane
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
+if not pygame.image.get_extended():
+    raise SystemExit, "Sorry, extended image module required"
 
 
 #functions to create our resources
