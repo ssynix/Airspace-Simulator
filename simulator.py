@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 16:46:55
+# @Last Modified time: 2014-10-04 16:47:35
 
 #/usr/bin/env python
 """
@@ -66,7 +66,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         center = self.image.get_rect().center
         heading = math.degrees(math.atan(1. * self.plane.speed.y/self.plane.speed.x))
         print self.plane.position, self.plane.destination, self.plane.speed, heading, "|"
-        self.image = pygame.transform.rotate(self.image, 90 + heading)
+        self.image = pygame.transform.rotate(self.image, heading)
         self.image.get_rect().center = center
 
     def update(self):
