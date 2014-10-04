@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 16:03:50
+# @Last Modified time: 2014-10-04 16:04:43
 
 #/usr/bin/env python
 """
@@ -63,7 +63,8 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (50, 50))
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
-        # self.image = pygame.transform.rotate(self.image, math.degrees(math.atan(float(self.plane.y)/self.plane.x)))
+        heading = math.degrees(math.atan(float(self.plane.position.y)/self.plane.position.x))
+        self.image = pygame.transform.rotate(self.image, heading)
 
     def update(self):
         "move the fist based on the mouse position"
