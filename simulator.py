@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 15:32:00
+# @Last Modified time: 2014-10-04 15:32:09
 
 #/usr/bin/env python
 """
@@ -33,7 +33,7 @@ def load_image(file):
     except pygame.error:
         raise SystemExit, 'Could not load image "%s" %s'%(file, pygame.get_error())
     return surface.convert()
-    
+
 #functions to create our resources
 # def load_image(name, colorkey=None):
 #     fullname = os.path.join('data', name)
@@ -68,7 +68,7 @@ class PlaneSprite(pygame.sprite.Sprite):
     """moves a clenched fist on the screen, following the mouse"""
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
-        self.image, self.rect = load_image('plane.gif', -1)
+        self.image, self.rect = load_image('plane.gif')
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
