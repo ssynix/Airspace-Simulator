@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 15:32:09
+# @Last Modified time: 2014-10-04 15:33:10
 
 #/usr/bin/env python
 """
@@ -25,29 +25,20 @@ if not pygame.image.get_extended():
     raise SystemExit, "Sorry, extended image module required"
 
 
-def load_image(file):
-    "loads an image, prepares it for play"
-    file = os.path.join('data', file)
-    try:
-        surface = pygame.image.load(file)
-    except pygame.error:
-        raise SystemExit, 'Could not load image "%s" %s'%(file, pygame.get_error())
-    return surface.convert()
-
 #functions to create our resources
-# def load_image(name, colorkey=None):
-#     fullname = os.path.join('data', name)
-#     try:
-#         image = pygame.image.load(fullname)
-#     except pygame.error, message:
-#         print 'Cannot load image:', fullname
-#         raise SystemExit, message
-#     image = image.convert()
-#     if colorkey is not None:
-#         if colorkey is -1:
-#             colorkey = image.get_at((0,0))
-#         image.set_colorkey(colorkey, RLEACCEL)
-#     return image, image.get_rect()
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    try:
+        image = pygame.image.load(fullname)
+    except pygame.error, message:
+        print 'Cannot load image:', fullname
+        raise SystemExit, message
+    image = image.convert()
+    if colorkey is not None:
+        if colorkey is -1:
+            colorkey = image.get_at((0,0))
+        image.set_colorkey(colorkey, RLEACCEL)
+    return image, image.get_rect()
 
 def load_sound(name):
     class NoneSound:
@@ -68,7 +59,7 @@ class PlaneSprite(pygame.sprite.Sprite):
     """moves a clenched fist on the screen, following the mouse"""
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
-        self.image, self.rect = load_image('plane.gif')
+        self.image, self.rect = load_image('plane.gif', -1)
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
