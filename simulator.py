@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 15:50:48
+# @Last Modified time: 2014-10-04 15:53:06
 
 #/usr/bin/env python
 """
@@ -14,7 +14,7 @@ follow along in the tutorial.
 
 
 #Import Modules
-import os, pygame
+import os, pygame, math
 from pygame.locals import *
 from random import randint
 from things import Plane
@@ -63,7 +63,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (50, 50))
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
-        self.image = pygame.transform.rotate(self.image, )
+        self.image = pygame.transform.rotate(self.image, (self.plane.y/self.plane.x))
 
     def update(self):
         "move the fist based on the mouse position"
