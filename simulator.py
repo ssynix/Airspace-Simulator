@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 15:40:11
+# @Last Modified time: 2014-10-04 15:40:28
 
 #/usr/bin/env python
 """
@@ -33,7 +33,7 @@ def load_image(name, colorkey=None):
     except pygame.error, message:
         print 'Cannot load image:', fullname
         raise SystemExit, message
-    image = image.convert()
+    image = image.convert_alpha()
     if colorkey is not None:
         if colorkey is -1:
             colorkey = image.get_at((0,0))
