@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 16:07:53
+# @Last Modified time: 2014-10-04 16:36:23
 
 
 class Vector:
@@ -29,7 +29,6 @@ class Vector:
 class Plane:
     def __init__(self, x, y, altitude):
         self.position = Vector(x, y, altitude)
-        self.speed = Vector(0, 0, 0)
 
     def setCourse(self, x, y, altitude, time):
         self.speed = (Vector(x, y, altitude) - self.position) / time
