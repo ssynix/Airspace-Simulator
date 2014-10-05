@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:17:35
+# @Last Modified time: 2014-10-05 16:18:21
 
 #/usr/bin/env python
 """
@@ -142,7 +142,7 @@ def main():
             pygame.draw.circle(screen, (255, 0, 0), sprite.plane.int2Dpos(), 50, 3)
         collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if p1.plane.squareDistance(p2.plane) < 50)
         print len(list(collisions))
-        pygame.time.delay(5000)
+        # pygame.time.delay(5000)
 
     #Draw Everything
         screen.blit(background, (0, 0))
