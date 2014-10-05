@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:54:47
+# @Last Modified time: 2014-10-05 17:01:17
 
 #/usr/bin/env python
 """
@@ -124,7 +124,7 @@ def main():
 #Create The Backgound
     background = pygame.Surface(screen.get_size())
     background = background.convert()
-    background.fill((200, 150, 50))
+    background.fill((55, 50, 150))
 
 # #Put Text On The Background, Centered
 #     if pygame.font:
