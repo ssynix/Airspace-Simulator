@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:22:38
+# @Last Modified time: 2014-10-05 14:23:36
 
 #/usr/bin/env python
 """
@@ -73,7 +73,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         center = self.rect.center
 
         self.image = pygame.transform.smoothscale(self.image, (50, 50))
-        if self.plane.speed.x is 0:
+        if self.plane.speed.x is 0.:
             heading = 0
         else:
             heading = math.degrees(math.atan(-1. * self.plane.speed.y/self.plane.speed.x))
