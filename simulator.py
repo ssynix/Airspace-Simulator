@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:12:13
+# @Last Modified time: 2014-10-05 16:13:37
 
 #/usr/bin/env python
 """
@@ -139,7 +139,8 @@ def main():
         allsprites.update()
 
         def flash(sprite):
-            pygame.draw.circle(screen, (255, 0, 0), sprite.plane.position._2d(), 50, 3)
+            print sprite.plane.position._2d()
+            # pygame.draw.circle(screen, (255, 0, 0), sprite.plane.position._2d(), 50, 3)
         collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if p1.plane.squareDistance(p2.plane) < 50)
         print len(list(collisions))
         pygame.time.delay(5000)
