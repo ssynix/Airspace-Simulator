@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 15:00:22
+# @Last Modified time: 2014-10-05 15:01:03
 
 
 class Vector:
@@ -39,7 +39,7 @@ class Plane:
         return self.position
 
     def distance(self, other):
-        return (other.position - self.position)^2
+        return (other.position - self.position)**2
 
 
 if __name__ == '__main__':
