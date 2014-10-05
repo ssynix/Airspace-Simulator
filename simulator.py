@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 22:51:51
+# @Last Modified time: 2014-10-04 22:52:07
 
 #/usr/bin/env python
 """
@@ -53,7 +53,7 @@ def load_sound(name):
         raise SystemExit, message
     return sound
 
-def color_surface(surface, red, green, blue):
+def color_surface(surface, (red, green, blue)):
     arr = pygame.surfarray.pixels3d(surface)
     arr[:,:,0] = red
     arr[:,:,1] = green
@@ -82,9 +82,8 @@ class PlaneSprite(pygame.sprite.Sprite):
         print self.plane.speed, heading
         self.image = pygame.transform.rotate(self.image, heading)
 
-        # heightToColor = int((self.plane.position.z / 6e3) * 155 + 90)
-        heightToColor = 100
-        color_surface(self.image, heightToColor, heightToColor, heightToColor)
+        heightToColor = int((self.plane.position.z / 6e3) * 155 + 90)
+        color_surface(self.image, (heightToColor, heightToColor, heightToColor))
 
         self.rect = self.image.get_rect()
         self.rect.center = center
