@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 15:39:41
+# @Last Modified time: 2014-10-05 16:11:39
 
 
 class Vector:
@@ -11,6 +11,9 @@ class Vector:
         self.x = x
         self.y = y
         self.z = z
+
+    def _2d(self):
+        return (x, y)
 
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
