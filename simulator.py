@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:56:04
+# @Last Modified time: 2014-10-05 14:56:40
 
 #/usr/bin/env python
 """
@@ -24,6 +24,8 @@ if not pygame.mixer: print 'Warning, sound disabled'
 if not pygame.image.get_extended():
     raise SystemExit, "Sorry, extended image module required"
 
+#------------ CONSTANTS ------------------#
+PLANE_SIZE = 50.
 
 #functions to create our resources
 def load_image(name, colorkey=None):
@@ -70,7 +72,6 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
         # Scale down the icon
-        PLANE_SIZE = 50.
         scale = PLANE_SIZE / self.rect.width
 
         # Calculate heading and rotate the icon accordingly
