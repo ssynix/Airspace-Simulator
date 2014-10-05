@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:45:09
+# @Last Modified time: 2014-10-05 14:45:31
 
 #/usr/bin/env python
 """
@@ -121,7 +121,7 @@ def main():
 
 #Prepare Game Objects
     clock = pygame.time.Clock()
-    image, rect = load_image('plane.png', -1)
+    image, rect = load_image('fist.bmp', -1)
 
     planes = [PlaneSprite(image, rect) for i in range(12)]
     allsprites = pygame.sprite.RenderPlain(planes)
