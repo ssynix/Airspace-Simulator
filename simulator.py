@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 22:34:38
+# @Last Modified time: 2014-10-04 22:35:25
 
 #/usr/bin/env python
 """
@@ -80,6 +80,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, heading)
 
         heightToColor = (self.plane.position.z / 6e3) * 155 + 90
+        print heightToColor
         color_surface(self.image, (heightToColor, heightToColor, heightToColor))
 
         self.rect = self.image.get_rect()
