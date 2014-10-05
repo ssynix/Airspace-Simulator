@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 21:42:14
+# @Last Modified time: 2014-10-04 21:42:36
 
 #/usr/bin/env python
 """
@@ -128,7 +128,7 @@ def main():
     #Draw Everything
         screen.blit(background, (0, 0))
         allsprites.draw(screen)
-        pygame.draw.line(screen, (100,100,50), [planes[0].plane.position.x, planes[0].plane.position.y], [planes[0].plane.destination.x, planes[0].plane.destination.y], 5)
+        # pygame.draw.line(screen, (100,100,50), [planes[0].plane.position.x, planes[0].plane.position.y], [planes[0].plane.destination.x, planes[0].plane.destination.y], 5)
         pygame.display.flip()
 
 #Game Over
