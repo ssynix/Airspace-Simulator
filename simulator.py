@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:35:48
+# @Last Modified time: 2014-10-05 14:41:09
 
 #/usr/bin/env python
 """
@@ -71,7 +71,8 @@ class PlaneSprite(pygame.sprite.Sprite):
 
         # Scale down the icon
         ICON_SIZE = 50.
-        scale = ICON_SIZE / self.rect.width
+        scale = 1
+        # scale = ICON_SIZE / self.rect.width
 
         # Calculate heading and rotate the icon accordingly
         if self.plane.speed.x is 0.:
