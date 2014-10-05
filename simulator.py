@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 23:11:05
+# @Last Modified time: 2014-10-04 23:31:47
 
 #/usr/bin/env python
 """
@@ -58,6 +58,7 @@ def color_surface(surface, (red, green, blue)):
     arr[:,:,0] = red
     arr[:,:,1] = green
     arr[:,:,2] = blue
+    arr[:,:,3] = 0
 
 #classes for our game objects
 class PlaneSprite(pygame.sprite.Sprite):
