@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:48:33
+# @Last Modified time: 2014-10-05 14:56:04
 
 #/usr/bin/env python
 """
@@ -70,8 +70,8 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
         # Scale down the icon
-        ICON_SIZE = 50.
-        scale = ICON_SIZE / self.rect.width
+        PLANE_SIZE = 50.
+        scale = PLANE_SIZE / self.rect.width
 
         # Calculate heading and rotate the icon accordingly
         if self.plane.speed.x is 0.:
@@ -135,6 +135,7 @@ def main():
                 return
 
         allsprites.update()
+        collisions = ((p1, p2) for p1 in allsprites for p2 in allsprites if dist(p1, p2) < PLANE_SIZE)
 
     #Draw Everything
         screen.blit(background, (0, 0))
