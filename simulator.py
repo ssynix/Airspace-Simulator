@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:27:02
+# @Last Modified time: 2014-10-05 16:27:21
 
 #/usr/bin/env python
 """
@@ -146,7 +146,7 @@ def main():
         # pygame.draw.circle(screen, (255, 0, 0), (100, 100), 50, 2)
 
         def flash(sprite):
-            pygame.draw.circle(screen, (255, 0, 0), sprite.plane.int2Dpos(), 50, 1)
+            pygame.draw.circle(screen, (255, 0, 0), (0,0), 50, 1)
 
         collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if p1.plane.squareDistance(p2.plane) < 50)
         for x in collisions: pass
