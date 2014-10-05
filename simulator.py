@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:45:10
+# @Last Modified time: 2014-10-05 16:45:29
 
 #/usr/bin/env python
 """
@@ -29,7 +29,7 @@ if not pygame.image.get_extended():
 PLANE_SIZE = 50.
 MIN_ALTITUDE, MAX_ALTITUDE = 100., 600.
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
-ALERT_DIST = 3000.
+ALERT_DIST = 5000.
 
 #functions to create our resources
 def load_image(name, colorkey=None):
