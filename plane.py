@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:34:30
+# @Last Modified time: 2014-10-05 17:40:21
 
 
 class Vector:
@@ -48,7 +48,6 @@ class Plane:
 
     def flyAway(self):
         self.position += self.speed
-        return self.position
 
     def squareDistance(self, other):
         return sum((other.position - self.position) ** 2)
