@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 21:39:57
+# @Last Modified time: 2014-10-04 21:40:02
 
 #/usr/bin/env python
 """
@@ -79,8 +79,8 @@ class PlaneSprite(pygame.sprite.Sprite):
 
     def update(self):
         "move the fist based on the mouse position"
-        # newPos = self.plane.flyAway()        
-        # self.rect.center = (newPos.x, newPos.y)
+        newPos = self.plane.flyAway()        
+        self.rect.center = (newPos.x, newPos.y)
 
 def main():
     """this function is called when the program starts.
