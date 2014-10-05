@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:39:05
+# @Last Modified time: 2014-10-05 16:39:55
 
 #/usr/bin/env python
 """
@@ -71,8 +71,8 @@ class PlaneSprite(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
         self.image, self.rect = load_image('plane_low.png', -1)
-        self.plane = Plane(randint(0, 800), randint(0, 600), randint(MIN_ALTITUDE, MAX_ALTITUDE))
-        self.plane.setCourse(randint(0, 800), randint(0, 600), randint(MIN_ALTITUDE, MAX_ALTITUDE), 450.)
+        self.plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
+        self.plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), 450.)
 
         # Setting the position and saving it before transformations
         self.rect.center = self.plane.int2Dpos()
@@ -111,7 +111,7 @@ def main():
        a loop until the function returns."""
 #Initialize Everything
     pygame.init()
-    screen = pygame.display.set_mode((800, 600))
+    screen = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
     pygame.display.set_caption('Airspace Simulator')
 
 #Create The Backgound
