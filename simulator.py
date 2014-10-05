@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:06:03
+# @Last Modified time: 2014-10-05 14:07:02
 
 #/usr/bin/env python
 """
@@ -79,10 +79,10 @@ class PlaneSprite(pygame.sprite.Sprite):
             heading = math.degrees(math.atan(-1. * self.plane.speed.y/self.plane.speed.x))
         if self.plane.speed.x < 0:
             heading += 180
-        print self.plane.position, self.plane.destination
-        print self.plane.speed, heading
         self.image = pygame.transform.rotate(self.image, heading)
 
+        print self.rect.size, self.plane.position
+        print self.rect.topleft
         inv = pygame.Surface(self.rect.size, pygame.SRCALPHA)
         inv.fill((50,100,50,50))
         self.image.blit(inv, self.rect.topleft, None, BLEND_RGB_ADD)
