@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 20:30:22
+# @Last Modified time: 2014-10-04 20:31:06
 
 #/usr/bin/env python
 """
@@ -105,7 +105,7 @@ def main():
     clock = pygame.time.Clock()
     planes = (PlaneSprite() for i in range(1))
     allsprites = pygame.sprite.RenderPlain(planes)
-    pygame.draw.line(screen, (0,0,0), (planes[0].plane.position.x planes[0].plane.position.y), (planes[0].plane.destination.x, planes[0].plane.destination.y), 5)
+    pygame.draw.line(screen, (0,0,0), (planes[0].plane.position.x, planes[0].plane.position.y), (planes[0].plane.destination.x, planes[0].plane.destination.y), 5)
 
 #Main Loop
     while 1:
