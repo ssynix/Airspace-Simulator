@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:53:04
+# @Last Modified time: 2014-10-05 16:53:11
 
 #/usr/bin/env python
 """
@@ -26,10 +26,12 @@ if not pygame.image.get_extended():
     raise SystemExit, "Sorry, extended image module required"
 
 #------------ CONSTANTS ------------------#
+
 PLANE_SIZE = 50.
 MIN_ALTITUDE, MAX_ALTITUDE = 300., 600.
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
 ALERT_DIST = 5000.
+
 #------------ CONSTANTS ------------------#
 
 #functions to create our resources
