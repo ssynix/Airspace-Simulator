@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:53:29
+# @Last Modified time: 2014-10-05 16:53:32
 
 #/usr/bin/env python
 """
@@ -17,6 +17,7 @@ follow along in the tutorial.
 import os
 import pygame
 import math
+
 from pygame.locals import *
 from random import randint
 from things import Plane
