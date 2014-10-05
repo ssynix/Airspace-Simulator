@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:19:26
+# @Last Modified time: 2014-10-05 16:20:15
 
 #/usr/bin/env python
 """
@@ -129,7 +129,7 @@ def main():
     while 1:
         clock.tick(40)
 
-    #Handle Input Events
+        #Handle Input Events
         for event in pygame.event.get():
             if event.type == QUIT:
                 return
