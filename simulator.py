@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:35:35
+# @Last Modified time: 2014-10-05 16:35:44
 
 #/usr/bin/env python
 """
@@ -130,7 +130,7 @@ def main():
 
 #Prepare Game Objects
     clock = pygame.time.Clock()
-    planes = [PlaneSprite() for i in range(1)]
+    planes = [PlaneSprite() for i in range(12)]
     allsprites = pygame.sprite.RenderPlain(planes)
 
 #Main Loop
