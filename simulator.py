@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 20:37:55
+# @Last Modified time: 2014-10-04 20:38:15
 
 #/usr/bin/env python
 """
@@ -124,6 +124,7 @@ def main():
     #Draw Everything
         screen.blit(background, (0, 0))
         allsprites.draw(screen)
+        GREEN = (  0, 255,   0)
         pygame.draw.line(screen, GREEN, [0, 0], [50,30], 5)
         pygame.display.flip()
 
