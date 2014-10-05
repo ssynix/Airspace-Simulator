@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:51:55
+# @Last Modified time: 2014-10-05 17:52:14
 
 #/usr/bin/env python
 """
@@ -35,6 +35,7 @@ MIN_ALTITUDE, MAX_ALTITUDE = 300., 600.
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
 ALERT_DIST = 5000.
 NUMBER_OF_PLANES = 15
+SPEED = 450.
 
 #------------ CONSTANTS ------------------#
 
