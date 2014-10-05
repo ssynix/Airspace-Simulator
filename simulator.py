@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:28:24
+# @Last Modified time: 2014-10-05 14:28:56
 
 #/usr/bin/env python
 """
@@ -85,15 +85,15 @@ class PlaneSprite(pygame.sprite.Sprite):
             heading += 180
         self.image = pygame.transform.rotate(self.image, heading)
 
+        # Restore the image to its original coordinates
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+
         # Change the plane's color according to its height
         heightToColor = int((self.plane.position.z / 6e3) * 155 + 90)
         heightColor = pygame.Surface((50, 50))
         heightColor.fill((heightToColor, heightToColor, heightToColor))
         self.image.blit(heightColor, (0, 0), None, BLEND_MIN)
-
-        # Restore the image to its original coordinates
-        self.rect = self.image.get_rect()
-        self.rect.center = center
 
     def update(self):
         "move the fist based on the mouse position"
