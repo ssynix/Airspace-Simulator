@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:01:17
+# @Last Modified time: 2014-10-05 17:27:11
 
 #/usr/bin/env python
 """
@@ -34,6 +34,7 @@ PLANE_SIZE = 50.
 MIN_ALTITUDE, MAX_ALTITUDE = 300., 600.
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
 ALERT_DIST = 5000.
+NUMBER_OF_PLANES = 15
 
 #------------ CONSTANTS ------------------#
 
@@ -139,7 +140,7 @@ def main():
 
 #Prepare Game Objects
     clock = pygame.time.Clock()
-    planes = [PlaneSprite() for i in range(12)]
+    planes = [PlaneSprite() for i in range(NUMBER_OF_PLANES)]
     allsprites = pygame.sprite.RenderPlain(planes)
 
 #Main Loop
