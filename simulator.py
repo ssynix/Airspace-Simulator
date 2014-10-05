@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:54:30
+# @Last Modified time: 2014-10-05 16:54:47
 
 #/usr/bin/env python
 """
@@ -19,9 +19,9 @@ import os
 import pygame
 
 from itertools import product
+from plane import Plane
 from pygame.locals import *
 from random import randint
-from plane import Plane
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
