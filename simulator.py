@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:34:24
+# @Last Modified time: 2014-10-05 14:35:07
 
 #/usr/bin/env python
 """
@@ -87,8 +87,8 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.image = pygame.transform.rotozoom(self.image, heading, scale)
 
         # Restore the image to its original coordinates
-        self.rect = self.image.get_rect()
-        self.rect.center = center
+        # self.rect = self.image.get_rect()
+        # self.rect.center = center
 
         # Change the plane's color according to its height
         heightToColor = int((self.plane.position.z / 6e3) * 155 + 90)
