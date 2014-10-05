@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:03:51
+# @Last Modified time: 2014-10-05 14:04:29
 
 #/usr/bin/env python
 """
@@ -84,7 +84,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.image, heading)
 
         inv = pygame.Surface(self.rect.size, pygame.SRCALPHA)
-        inv.fill((200,200,200,200))
+        inv.fill((50,50,50,50))
         self.image.blit(inv, (self.plane.position.x,self.plane.position.y), None, BLEND_RGB_ADD)
         # heightToColor = int((self.plane.position.z / 6e3) * 155 + 90)
         # self.colored = self.image.copy()
