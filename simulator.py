@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 21:39:37
+# @Last Modified time: 2014-10-04 21:39:57
 
 #/usr/bin/env python
 """
@@ -68,7 +68,7 @@ class PlaneSprite(pygame.sprite.Sprite):
 
         self.image = pygame.transform.smoothscale(self.image, (50, 50))
         heading = math.degrees(math.atan(-1. * self.plane.speed.y/self.plane.speed.x))
-        if self.plane.speed.x < 0 and self.plane.speed.y < 0:
+        if self.plane.speed.x < 0 and self.plane.speed.y > 0:
             heading = -heading
         print self.plane.position, self.plane.destination
         print self.plane.speed, heading
