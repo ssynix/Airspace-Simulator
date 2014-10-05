@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 15:39:23
+# @Last Modified time: 2014-10-05 15:39:41
 
 
 class Vector:
@@ -48,8 +48,7 @@ class Plane:
         return self.position
 
     def squareDistance(self, other):
-        print sum((other.position - self.position) ** 2)
-        return 0
+        return sum((other.position - self.position) ** 2)
 
 
 if __name__ == '__main__':
