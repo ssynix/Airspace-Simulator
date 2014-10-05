@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:23:36
+# @Last Modified time: 2014-10-05 14:24:53
 
 #/usr/bin/env python
 """
@@ -69,10 +69,14 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
+        # Save the original position before any transformation
         self.rect.center = (self.plane.position.x, self.plane.position.y)
         center = self.rect.center
 
+        # Scale down the icon
         self.image = pygame.transform.smoothscale(self.image, (50, 50))
+
+        # Calculate heading and rotate the icon accordingly
         if self.plane.speed.x is 0.:
             heading = 0
         else:
