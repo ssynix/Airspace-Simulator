@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 20:21:15
+# @Last Modified time: 2014-10-04 20:22:06
 
 #/usr/bin/env python
 """
@@ -73,7 +73,7 @@ class PlaneSprite(pygame.sprite.Sprite):
 
         pos_org = (x_cntr - self.image.get_rect().width / 2, y_cntr - self.image.get_rect().height / 2)
         image_rotated = pygame.transform.rotate(self.image, heading) #rotate image
-        pos_new = (x_pos_org - image_rotated.get_rect().width / 2, y_pos_org - image_rotated.get_rect().height / 2)
+        pos_new = (pos_org[0] - image_rotated.get_rect().width / 2, pos_org[1] - image_rotated.get_rect().height / 2)
 
     def update(self):
         "move the fist based on the mouse position"
