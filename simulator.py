@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:27:32
+# @Last Modified time: 2014-10-05 16:32:24
 
 #/usr/bin/env python
 """
@@ -72,6 +72,10 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
+        # Setting the position and saving it before transformations
+        self.rect.center = self.plane.int2Dpos()
+        center = self.rect.center
+
         # Scale down the icon
         scale = PLANE_SIZE / self.rect.width
 
@@ -83,6 +87,10 @@ class PlaneSprite(pygame.sprite.Sprite):
         if self.plane.speed.x < 0.:
             heading += 180
         self.image = pygame.transform.rotozoom(self.image, heading, scale)
+
+        # Restoring the position after transformations
+        self.rect = self.image.get_rect()
+        self.rect.center = center
 
         # Change the plane's color according to its height
         heightToColor = int((self.plane.position.z / 6e3) * 155 + 90)
