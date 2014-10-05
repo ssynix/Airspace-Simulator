@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 23:46:00
+# @Last Modified time: 2014-10-04 23:46:13
 
 #/usr/bin/env python
 """
@@ -54,7 +54,7 @@ def load_sound(name):
     return sound
 
 def color_surface(surface, (red, green, blue)):
-    arr = pygame.surfarray.pixels4d(surface)
+    arr = pygame.surfarray.pixels3d(surface)
     arr[:,:,0] = red
     arr[:,:,1] = green
     arr[:,:,2] = blue
