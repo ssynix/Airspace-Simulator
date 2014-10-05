@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:19:53
+# @Last Modified time: 2014-10-05 17:23:04
 
 
 class Vector:
@@ -56,3 +56,4 @@ class Plane:
 
     def int2Dpos(self):
         return int(self.position.x), int(self.position.y)
+        
