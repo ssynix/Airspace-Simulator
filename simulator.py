@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:58:22
+# @Last Modified time: 2014-10-05 14:58:56
 
 #/usr/bin/env python
 """
@@ -136,7 +136,7 @@ def main():
                 return
 
         allsprites.update()
-        collisions = ((p1, p2) for p1 in allsprites for p2 in allsprites if p1.distance(p2) < PLANE_SIZE)
+        collisions = ((p1, p2) for p1 in allsprites for p2 in allsprites if p1.plane.distance(p2.plane) < PLANE_SIZE)
 
     #Draw Everything
         screen.blit(background, (0, 0))
