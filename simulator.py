@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 20:53:20
+# @Last Modified time: 2014-10-04 20:53:33
 
 #/usr/bin/env python
 """
@@ -62,7 +62,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.image, self.rect = load_image('plane.png', -1)
         center = self.rect.center
         self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect.center = center
+        self.image.get_rect().center = center
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
