@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 21:09:23
+# @Last Modified time: 2014-10-04 21:15:18
 
 #/usr/bin/env python
 """
@@ -63,23 +63,15 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
-        # replace new_width and new_height with the desired width and height
         self.rect.center = (self.plane.position.x, self.plane.position.y)
         center = self.rect.center
+
         self.image = pygame.transform.scale(self.image, (50, 50))
+        heading = math.degrees(math.atan(1. * self.plane.speed.y/self.plane.speed.x))
+        self.image = pygame.transform.rotate(self.image, heading)
+
         self.rect = self.image.get_rect()
         self.rect.center = center
-
-        # center = self.rect.center
-        # self.image = pygame.transform.smoothscale(self.image, (50, 50))
-        # self.rect.center = (800, 600)
-        # # self.rect.center = (20,20)
-
-        # center = self.image.get_rect().center
-        # heading = math.degrees(math.atan(1. * self.plane.speed.y/self.plane.speed.x))
-        # print self.plane.position, self.plane.destination, self.plane.speed, heading
-        # self.image = pygame.transform.rotate(self.image, heading)
-        # self.image.get_rect().center = center
 
     def update(self):
         "move the fist based on the mouse position"
