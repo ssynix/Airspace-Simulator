@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 21:06:05
+# @Last Modified time: 2014-10-04 21:08:57
 
 #/usr/bin/env python
 """
@@ -63,11 +63,17 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.plane = Plane(randint(0, 800), randint(0, 600), randint(1e3, 6e3))
         self.plane.setCourse(randint(0, 800), randint(0, 600), randint(1e3, 6e3), 450.)
 
-        self.rect.center = (self.plane.position.x, self.plane.position.y)
+        # replace new_width and new_height with the desired width and height
         center = self.rect.center
-        self.image = pygame.transform.smoothscale(self.image, (50, 50))
-        self.rect.center = (800, 600)
-        # self.rect.center = (20,20)
+        self.image = pygame.transform.scale(self.image, (50, 50))
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+
+        # self.rect.center = (self.plane.position.x, self.plane.position.y)
+        # center = self.rect.center
+        # self.image = pygame.transform.smoothscale(self.image, (50, 50))
+        # self.rect.center = (800, 600)
+        # # self.rect.center = (20,20)
 
         # center = self.image.get_rect().center
         # heading = math.degrees(math.atan(1. * self.plane.speed.y/self.plane.speed.x))
