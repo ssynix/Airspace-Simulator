@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 21:01:50
+# @Last Modified time: 2014-10-04 21:02:40
 
 #/usr/bin/env python
 """
@@ -66,6 +66,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.rect.center = (self.plane.position.x, self.plane.position.y)
         center = self.rect.center
         self.image = pygame.transform.scale(self.image, (50, 50))
+        self.image.get_rect().center = (self.plane.position.x, self.plane.position.y)
         # self.rect.center = (20,20)
 
         # center = self.image.get_rect().center
