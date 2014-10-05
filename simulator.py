@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 20:38:36
+# @Last Modified time: 2014-10-04 20:39:59
 
 #/usr/bin/env python
 """
@@ -74,6 +74,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         "move the fist based on the mouse position"
         # newPos = self.plane.flyAway()        
         # self.rect.midtop = (newPos.x, newPos.y)
+        self.rect.midtop = (self.plane.position.x, self.plane.position.y)
 
 def main():
     """this function is called when the program starts.
@@ -105,7 +106,6 @@ def main():
     clock = pygame.time.Clock()
     planes = [PlaneSprite() for i in range(1)]
     allsprites = pygame.sprite.RenderPlain(planes)
-    print [planes[0].plane.position.x, planes[0].plane.position.y], [planes[0].plane.destination.x, planes[0].plane.destination.y]
 
 #Main Loop
     while 1:
