@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 15:38:49
+# @Last Modified time: 2014-10-05 15:39:01
 
 
 class Vector:
@@ -24,7 +24,7 @@ class Vector:
 
     def __pow__(self, scalar):
         scalar = float(scalar)
-        return Vector(self.x / scalar, self.y / scalar, self.z / scalar)
+        return Vector(self.x ** scalar, self.y ** scalar, self.z ** scalar)
 
     def __repr__(self):
         return "<Vector (%s, %s, %s)>" % (self.x, self.y, self.z)
@@ -48,7 +48,7 @@ class Plane:
         return self.position
 
     def squareDistance(self, other):
-        return (other.position - self.position)
+        return sum((other.position - self.position) ** 2)
 
 
 if __name__ == '__main__':
