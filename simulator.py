@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:33:32
+# @Last Modified time: 2014-10-05 14:33:36
 
 #/usr/bin/env python
 """
@@ -73,7 +73,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.rect.center = (self.plane.position.x, self.plane.position.y)
         center = self.rect.center
 
-        # S
+        # Scale down the icon
         self.image = pygame.transform.smoothscale(self.image, (50, 50))
 
         # Calculate heading and rotate the icon accordingly
