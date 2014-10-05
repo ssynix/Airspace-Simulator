@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:40:16
+# @Last Modified time: 2014-10-05 17:41:18
 
 #/usr/bin/env python
 """
@@ -106,7 +106,7 @@ class PlaneSprite(pygame.sprite.Sprite):
     def update(self):
         "move the fist based on the mouse position"
         self.plane.flyAway()    
-        self.rect.center = (newPos.x, newPos.y)
+        self.rect.center = self.plane.int2Dpos()
 
         # Change the plane's color according to its height
         heightToColor = int(((self.plane.position.z - MIN_ALTITUDE) / (MAX_ALTITUDE - MIN_ALTITUDE)) * 255)
