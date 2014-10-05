@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:36:36
+# @Last Modified time: 2014-10-05 16:38:38
 
 #/usr/bin/env python
 """
@@ -27,6 +27,8 @@ if not pygame.image.get_extended():
 
 #------------ CONSTANTS ------------------#
 PLANE_SIZE = 50.
+MIN_ALTITUDE = 100
+MAX_ALTITUDE = 600
 
 #functions to create our resources
 def load_image(name, colorkey=None):
