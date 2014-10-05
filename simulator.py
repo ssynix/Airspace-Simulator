@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:26:15
+# @Last Modified time: 2014-10-05 14:27:37
 
 #/usr/bin/env python
 """
@@ -89,7 +89,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         heightToColor = int((self.plane.position.z / 6e3) * 155 + 90)
         heightColor = pygame.Surface(self.rect.size)
         heightColor.fill((heightToColor, heightToColor, heightToColor))
-        self.image.blit(heightColor, (0,0), None, BLEND_MIN)
+        self.image.blit(heightColor, self.rect, None, BLEND_MIN)
 
         # Restore the image to its original coordinates
         self.rect = self.image.get_rect()
