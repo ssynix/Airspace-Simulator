@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:44:37
+# @Last Modified time: 2014-10-05 16:44:57
 
 #/usr/bin/env python
 """
@@ -161,7 +161,7 @@ def main():
 
         collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if 0 < p1.plane.squareDistance(p2.plane) < PLANE_SIZE ** 2)
         for x in collisions: pass
-        pygame.time.delay(250)
+        # pygame.time.delay(250)
 
         pygame.display.flip()
     #Game Over
