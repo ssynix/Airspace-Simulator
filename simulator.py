@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 15:31:33
+# @Last Modified time: 2014-10-05 15:31:57
 
 #/usr/bin/env python
 """
@@ -138,6 +138,7 @@ def main():
         allsprites.update()
         collisions = ((p1.plane, p2.plane) for p1 in allsprites for p2 in allsprites 
                       if p1.plane.squareDistance(p2.plane) < 50)
+        list(collisions)
         # print [(p[0].position, p[1].position) for p in collisions]
         pygame.time.delay(5000)
 
