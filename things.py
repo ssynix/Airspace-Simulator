@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 22:33:10
+# @Last Modified time: 2014-10-05 15:00:22
 
 
 class Vector:
@@ -37,6 +37,9 @@ class Plane:
     def flyAway(self):
         self.position += self.speed
         return self.position
+
+    def distance(self, other):
+        return (other.position - self.position)^2
 
 
 if __name__ == '__main__':
