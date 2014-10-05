@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 14:43:12
+# @Last Modified time: 2014-10-05 14:44:59
 
 #/usr/bin/env python
 """
@@ -63,7 +63,6 @@ def color_surface(surface, (red, green, blue)):
 #classes for our game objects
 class PlaneSprite(pygame.sprite.Sprite):
     """moves a clenched fist on the screen, following the mouse"""
-    image, rect = load_image('plane.png', -1)
     def __init__(self):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
         self.image, self.rect = image, rect
@@ -122,7 +121,9 @@ def main():
 
 #Prepare Game Objects
     clock = pygame.time.Clock()
-    planes = [PlaneSprite() for i in range(12)]
+    image, rect = load_image('plane.png', -1)
+
+    planes = [PlaneSprite(image, rect) for i in range(12)]
     allsprites = pygame.sprite.RenderPlain(planes)
 
 #Main Loop
