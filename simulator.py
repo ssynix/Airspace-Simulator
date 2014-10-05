@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:41:18
+# @Last Modified time: 2014-10-05 17:44:04
 
 #/usr/bin/env python
 """
@@ -80,7 +80,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
         self.image, self.rect = load_image('plane_low.png', -1)
         self.plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
-        self.plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), 450.)
+        self.plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), MIN_ALTITUDE, 450.)
 
         # Setting the position and saving it before transformations
         self.rect.center = self.plane.int2Dpos()
