@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:06:51
+# @Last Modified time: 2014-10-05 16:08:09
 
 #/usr/bin/env python
 """
@@ -139,6 +139,8 @@ def main():
         allsprites.update()
 
         def flash(sprite):
+
+            import pdb; pdb.set_trace()
             print allsprites
         collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if p1.plane.squareDistance(p2.plane) < 50)
         print len(list(collisions))
