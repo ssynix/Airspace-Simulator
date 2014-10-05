@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:20:15
+# @Last Modified time: 2014-10-05 16:22:33
 
 #/usr/bin/env python
 """
@@ -138,12 +138,6 @@ def main():
 
         allsprites.update()
 
-        def flash(sprite):
-            pygame.draw.circle(screen, (255, 0, 0), sprite.plane.int2Dpos(), 50, 3)
-
-        pygame.draw.circle(screen, (255, 0, 0), (100, 100), 50, 5)
-        collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if p1.plane.squareDistance(p2.plane) < 50)
-        pygame.time.delay(250)
 
     #Draw Everything
         screen.blit(background, (0, 0))
@@ -151,7 +145,13 @@ def main():
         # pygame.draw.line(screen, (100,100,50), [planes[0].plane.position.x, planes[0].plane.position.y], [planes[0].plane.destination.x, planes[0].plane.destination.y], 5)
         pygame.display.flip()
 
-#Game Over
+        def flash(sprite):
+            pygame.draw.circle(screen, (255, 0, 0), sprite.plane.int2Dpos(), 50, 3)
+
+        pygame.draw.circle(screen, (255, 0, 0), (100, 100), 50, 5)
+        collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if p1.plane.squareDistance(p2.plane) < 50)
+        pygame.time.delay(250)
+    #Game Over
 
 
 #this calls the 'main' function when this script is executed
