@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-04 21:42:46
+# @Last Modified time: 2014-10-04 22:03:31
 
 #/usr/bin/env python
 """
@@ -114,7 +114,7 @@ def main():
 
 #Main Loop
     while 1:
-        clock.tick(60)
+        clock.tick(5)
 
     #Handle Input Events
         for event in pygame.event.get():
