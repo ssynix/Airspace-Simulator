@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:53:32
+# @Last Modified time: 2014-10-05 16:53:54
 
 #/usr/bin/env python
 """
@@ -14,14 +14,14 @@ follow along in the tutorial.
 
 
 #Import Modules
+import math
 import os
 import pygame
-import math
 
+from itertools import product
 from pygame.locals import *
 from random import randint
 from things import Plane
-from itertools import product
 
 if not pygame.font: print 'Warning, fonts disabled'
 if not pygame.mixer: print 'Warning, sound disabled'
