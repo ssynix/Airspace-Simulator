@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 16:51:33
+# @Last Modified time: 2014-10-05 16:52:09
 
 #/usr/bin/env python
 """
@@ -96,7 +96,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.rect.center = center
 
         # Change the plane's color according to its height
-        heightToColor = int((self.plane.position.z / MAX_ALTITUDE) * 155 + 100)
+        heightToColor = int((self.plane.position.z / MAX_ALTITUDE) * 255)
         heightColor = pygame.Surface(self.rect.size)
         heightColor.fill((heightToColor, heightToColor, heightToColor))
         self.image.blit(heightColor, (0, 0), None, BLEND_MIN)
