@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 20:37:18
+# @Last Modified time: 2014-10-05 20:38:18
 
 #/usr/bin/env python
 """
@@ -85,11 +85,11 @@ class PlaneSprite(pygame.sprite.Sprite):
         scale = PLANE_SIZE / self.rect.width
 
         # Calculate heading and rotate the icon accordingly
-        if self.plane.speed.x is 0.:
+        if self.plane.speed.x is 0:
             heading = 0
         else:
-            heading = math.degrees(math.atan(-1. * self.plane.speed.y/self.plane.speed.x))
-        if self.plane.speed.x < 0.:
+            heading = math.degrees(math.atan(-self.plane.speed.y/self.plane.speed.x))
+        if self.plane.speed.x < 0:
             heading += 180
         self.image = pygame.transform.rotozoom(self.image, heading, scale)
 
