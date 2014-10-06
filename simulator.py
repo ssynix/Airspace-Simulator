@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 20:33:54
+# @Last Modified time: 2014-10-05 20:37:18
 
 #/usr/bin/env python
 """
@@ -14,11 +14,11 @@ follow along in the tutorial.
 
 
 #Import Modules
+from __future__ import division
 import math
 import os
 import pygame
 
-from __future__ import division
 from itertools import product
 from plane import Plane
 from pygame.locals import *
@@ -67,13 +67,6 @@ def load_sound(name):
         print 'Cannot load sound:', fullname
         raise SystemExit, message
     return sound
-
-def color_surface(surface, (red, green, blue)):
-    arr = pygame.surfarray.pixels3d(surface)
-    arr[:,:,0] = red
-    arr[:,:,1] = green
-    arr[:,:,2] = blue
-    arr[:,:,3] = 0
 
 #classes for our game objects
 class PlaneSprite(pygame.sprite.Sprite):
