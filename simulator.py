@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:52:14
+# @Last Modified time: 2014-10-05 20:33:54
 
 #/usr/bin/env python
 """
@@ -18,6 +18,7 @@ import math
 import os
 import pygame
 
+from __future__ import division
 from itertools import product
 from plane import Plane
 from pygame.locals import *
@@ -30,12 +31,12 @@ if not pygame.image.get_extended():
 
 #------------ CONSTANTS ------------------#
 
-PLANE_SIZE = 50.
-MIN_ALTITUDE, MAX_ALTITUDE = 300., 600.
+PLANE_SIZE = 50
+MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
-ALERT_DIST = 5000.
+ALERT_DIST = 5000
 NUMBER_OF_PLANES = 15
-SPEED = 450.
+SPEED = 450
 
 #------------ CONSTANTS ------------------#
 
