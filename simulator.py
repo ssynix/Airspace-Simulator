@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 20:39:33
+# @Last Modified time: 2014-10-05 20:40:20
 
 #/usr/bin/env python
 """
@@ -157,8 +157,6 @@ def main():
     #Draw Everything
         screen.blit(background, (0, 0))
         allsprites.draw(screen)
-        # pygame.draw.line(screen, (100,100,50), [planes[0].plane.position.x, planes[0].plane.position.y], [planes[0].plane.destination.x, planes[0].plane.destination.y], 5)
-        # pygame.draw.circle(screen, (255, 0, 0), (100, 100), 50, 2)
 
         def flash(sprite):
             pygame.draw.circle(screen, (255, 0, 0), sprite.plane.int2Dpos(), 50, 1)
