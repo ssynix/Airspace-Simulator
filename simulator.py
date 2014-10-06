@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 20:40:20
+# @Last Modified time: 2014-10-05 21:33:18
 
 #/usr/bin/env python
 """
@@ -88,6 +88,7 @@ class PlaneSprite(pygame.sprite.Sprite):
         if self.plane.speed.x is 0:
             heading = 0
         else:
+            -self.plane.speed.y/self.plane.speed.x
             heading = math.degrees(math.atan(-self.plane.speed.y/self.plane.speed.x))
         if self.plane.speed.x < 0:
             heading += 180
