@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 17:40:21
+# @Last Modified time: 2014-10-05 20:38:31
 
 
 class Vector:
@@ -22,11 +22,9 @@ class Vector:
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __div__(self, scalar):
-        scalar = float(scalar)
         return Vector(self.x / scalar, self.y / scalar, self.z / scalar)
 
     def __pow__(self, scalar):
-        scalar = float(scalar)
         return Vector(self.x ** scalar, self.y ** scalar, self.z ** scalar)
 
     def __repr__(self):
