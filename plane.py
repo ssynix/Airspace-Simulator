@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 20:38:48
+# @Last Modified time: 2014-10-12 17:47:39
 
 
 class Vector:
@@ -11,9 +11,6 @@ class Vector:
         self.x = x
         self.y = y
         self.z = z
-
-    def _2d(self):
-        return (self.x, self.y)
 
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -38,15 +35,21 @@ class Vector:
 
 
 class Plane:
+    ID = 0
+
     def __init__(self, x, y, altitude):
         self.position = Vector(x, y, altitude)
+        self.radarInput = []
+        self.id = Plane.ID
+        Plane.ID += 1
 
     def setCourse(self, x, y, altitude, time):
-        self.destination = Vector(x,y,altitude)
-        self.speed = (Vector(x, y, altitude) - self.position) / time
+        self.destination = Vector(x, y, altitude)
+        self.speed = (self.destination - self.position) / time
 
     def flyAway(self):
         self.position += self.speed
+
 
     def squareDistance(self, other):
         return sum((other.position - self.position) ** 2)

@@ -2,16 +2,9 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-05 21:36:24
+# @Last Modified time: 2014-10-12 20:46:40
 
 #/usr/bin/env python
-"""
-This simple example is used for the line-by-line tutorial
-that comes with pygame. It is based on a 'popular' web banner.
-Note there are comments here, but for the full explanation, 
-follow along in the tutorial.
-"""
-
 
 #Import Modules
 from __future__ import division
@@ -34,11 +27,14 @@ if not pygame.image.get_extended():
 PLANE_SIZE = 50
 MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
-ALERT_DIST = 5000
+COLLISION_DIST_SQ = (PLANE_SIZE/2) ** 2
+ALERT_DIST_SQ = 5 * COLLISION_DIST_SQ
 NUMBER_OF_PLANES = 15
-SPEED = 450
+SPEED = 400  # Number of frames it takes for each plane to reach its destination
+FRAMERATE = 40
 
 #------------ CONSTANTS ------------------#
+
 
 #functions to create our resources
 def load_image(name, colorkey=None):
@@ -55,6 +51,7 @@ def load_image(name, colorkey=None):
         image.set_colorkey(colorkey, RLEACCEL)
     return image, image.get_rect()
 
+
 def load_sound(name):
     class NoneSound:
         def play(self): pass
@@ -67,6 +64,7 @@ def load_sound(name):
         print 'Cannot load sound:', fullname
         raise SystemExit, message
     return sound
+
 
 #classes for our game objects
 class PlaneSprite(pygame.sprite.Sprite):
@@ -110,10 +108,8 @@ class PlaneSprite(pygame.sprite.Sprite):
             heightColor.fill((heightToColor, heightToColor, heightToColor))
             self.image.blit(heightColor, (0, 0), None, BLEND_MIN)
 
+
 def main():
-    """this function is called when the program starts.
-       it initializes everything it needs, then runs in
-       a loop until the function returns."""
 #Initialize Everything
     pygame.init()
     screen = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
@@ -124,13 +120,6 @@ def main():
     background = background.convert()
     background.fill((55, 50, 150))
 
-# #Put Text On The Background, Centered
-#     if pygame.font:
-#         font = pygame.font.Font(None, 36)
-#         text = font.render("Pummel The Chimp, And Win $$$", 1, (10, 10, 10))
-#         textpos = text.get_rect(centerx=background.get_width()/2)
-#         background.blit(text, textpos)
-
 #Display The Background
     screen.blit(background, (0, 0))
     pygame.display.flip()
@@ -139,10 +128,11 @@ def main():
     clock = pygame.time.Clock()
     planes = [PlaneSprite() for i in range(NUMBER_OF_PLANES)]
     allsprites = pygame.sprite.RenderPlain(planes)
+    collisions = 0
 
 #Main Loop
     while 1:
-        clock.tick(40)
+        clock.tick(FRAMERATE)
 
         #Handle Input Events
         for event in pygame.event.get():
@@ -158,11 +148,28 @@ def main():
         screen.blit(background, (0, 0))
         allsprites.draw(screen)
 
-        def flash(sprite):
-            pygame.draw.circle(screen, (255, 0, 0), sprite.plane.int2Dpos(), 50, 1)
+        def flash(sprite, status):
+            if status == 'ALERT':
+                color = Color('yellow')
+                radius = int(math.sqrt(ALERT_DIST_SQ))
+            elif status == 'COLLISION':
+                color = Color('red')
+                radius = int(math.sqrt(COLLISION_DIST_SQ))
 
-        collisions = ((flash(p1), flash(p2)) for (p1, p2) in product(allsprites, repeat=2) if 0 < p1.plane.squareDistance(p2.plane) < PLANE_SIZE ** 2)
-        for x in collisions: pass
+            pygame.draw.circle(screen, color, sprite.plane.int2Dpos(), radius, 1)
+
+        for (p1, p2) in product(allsprites, repeat=2):
+            if 0 < p1.plane.squareDistance(p2.plane) < COLLISION_DIST_SQ:
+                flash(p1, 'COLLISION')
+                flash(p2, 'COLLISION')
+                collisions += 1
+            if 0 < p1.plane.squareDistance(p2.plane) < ALERT_DIST_SQ:
+                flash(p1, 'ALERT')
+                flash(p2, 'ALERT')
+                p1.plane.radarInput.append(p2.plane)
+                p2.plane.radarInput.append(p1.plane)
+
+
         # pygame.time.delay(250)
 
         pygame.display.flip()
