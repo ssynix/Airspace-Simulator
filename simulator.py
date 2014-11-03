@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-10-12 20:46:40
+# @Last Modified time: 2014-11-03 14:31:53
 
 #/usr/bin/env python
 
@@ -24,13 +24,13 @@ if not pygame.image.get_extended():
 
 #------------ CONSTANTS ------------------#
 
-PLANE_SIZE = 50
+PLANE_SIZE = Plane.PLANE_SIZE
+COLLISION_DIST_SQ = Plane.COLLISION_DIST_SQ
+ALERT_DIST_SQ = 9 * COLLISION_DIST_SQ
 MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
-COLLISION_DIST_SQ = (PLANE_SIZE/2) ** 2
-ALERT_DIST_SQ = 5 * COLLISION_DIST_SQ
-NUMBER_OF_PLANES = 15
-SPEED = 400  # Number of frames it takes for each plane to reach its destination
+NUMBER_OF_PLANES = 12
+SPEED = 300  # Number of frames it takes for each plane to reach its destination
 FRAMERATE = 40
 
 #------------ CONSTANTS ------------------#
@@ -73,9 +73,18 @@ class PlaneSprite(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
         self.image, self.rect = load_image('plane_low.png', -1)
         self.plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
+        # self.plane.setCourse(randint(496, 500), 400, 600, SPEED)
         self.plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), SPEED)
 
+        self.originalImage = self.image
+
+
+    def update(self):
+        self.image = self.originalImage
+        self.rect = self.image.get_rect()
+
         # Setting the position and saving it before transformations
+        self.plane.flyAway()
         self.rect.center = self.plane.int2Dpos()
         center = self.rect.center
 
@@ -83,11 +92,11 @@ class PlaneSprite(pygame.sprite.Sprite):
         scale = PLANE_SIZE / self.rect.width
 
         # Calculate heading and rotate the icon accordingly
-        if self.plane.speed.x == 0:
+        if self.plane.velocity.x == 0:
             heading = 0
         else:
-            heading = math.degrees(math.atan(-self.plane.speed.y/self.plane.speed.x))
-        if self.plane.speed.x < 0:
+            heading = math.degrees(math.atan(-self.plane.velocity.y/self.plane.velocity.x))
+        if self.plane.velocity.x < 0:
             heading += 180
         self.image = pygame.transform.rotozoom(self.image, heading, scale)
 
@@ -95,18 +104,19 @@ class PlaneSprite(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = center
 
-
-    def update(self):
-        "move the fist based on the mouse position"
-        self.plane.flyAway()
-        self.rect.center = self.plane.int2Dpos()
+        white = pygame.Surface(self.rect.size)
+        white.fill(Color('white'))
+        self.image.blit(white, (0, 0), None, BLEND_MAX)
 
         # Change the plane's color according to its height
         heightToColor = int(((self.plane.position.z - MIN_ALTITUDE) / (MAX_ALTITUDE - MIN_ALTITUDE)) * 255)
-        if 0 <= heightToColor <= 255:
-            heightColor = pygame.Surface(self.rect.size)
-            heightColor.fill((heightToColor, heightToColor, heightToColor))
-            self.image.blit(heightColor, (0, 0), None, BLEND_MIN)
+        if heightToColor > 255:
+            heightToColor = 255
+        if heightToColor < 0:
+            heightToColor = 0
+        heightColor = pygame.Surface(self.rect.size)
+        heightColor.fill((heightToColor, heightToColor, heightToColor))
+        self.image.blit(heightColor, (0, 0), None, BLEND_MIN)
 
 
 def main():
@@ -128,11 +138,16 @@ def main():
     clock = pygame.time.Clock()
     planes = [PlaneSprite() for i in range(NUMBER_OF_PLANES)]
     allsprites = pygame.sprite.RenderPlain(planes)
-    collisions = 0
+
+    collisionCount = 0
+    ongoingCollisions = []
 
 #Main Loop
+    paused = False
+    frame = 0
     while 1:
         clock.tick(FRAMERATE)
+        frame += 1
 
         #Handle Input Events
         for event in pygame.event.get():
@@ -140,37 +155,59 @@ def main():
                 return
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 return
+            elif event.type == KEYDOWN and event.key == K_SPACE:
+                paused = not paused
+        if paused:
+            pygame.time.wait(200)  # Continue pausing until keypress
+            continue
 
+        for sprite in allsprites:
+            sprite.plane.processRadar()
         allsprites.update()
 
-
-    #Draw Everything
+        #Draw Everything
         screen.blit(background, (0, 0))
         allsprites.draw(screen)
+        # for (x, y, z) in (sprite.plane.destination for sprite in allsprites):
+        #     pygame.draw.circle(screen, Color('black'), (x, y), 2, 2)
 
         def flash(sprite, status):
             if status == 'ALERT':
                 color = Color('yellow')
-                radius = int(math.sqrt(ALERT_DIST_SQ))
+                radius = int(math.sqrt(ALERT_DIST_SQ)/2)
             elif status == 'COLLISION':
                 color = Color('red')
-                radius = int(math.sqrt(COLLISION_DIST_SQ))
-
+                radius = int(math.sqrt(COLLISION_DIST_SQ)/2)
             pygame.draw.circle(screen, color, sprite.plane.int2Dpos(), radius, 1)
 
-        for (p1, p2) in product(allsprites, repeat=2):
-            if 0 < p1.plane.squareDistance(p2.plane) < COLLISION_DIST_SQ:
-                flash(p1, 'COLLISION')
-                flash(p2, 'COLLISION')
-                collisions += 1
-            if 0 < p1.plane.squareDistance(p2.plane) < ALERT_DIST_SQ:
-                flash(p1, 'ALERT')
-                flash(p2, 'ALERT')
-                p1.plane.radarInput.append(p2.plane)
-                p2.plane.radarInput.append(p1.plane)
+        # Sending radar input to planes and detecting collisions
+        for (s1, s2) in product(allsprites, repeat=2):
+            if s1.plane.id < s2.plane.id:
+                if 0 < s1.plane.squareDistance(s2.plane) < COLLISION_DIST_SQ:
+                    flash(s1, 'COLLISION')
+                    flash(s2, 'COLLISION')
 
+                    if (s1.plane.id, s2.plane.id) not in ongoingCollisions:
+                        collisionCount += 1
+                        ongoingCollisions.append((s1.plane.id, s2.plane.id))
+                elif (s1.plane.id, s2.plane.id) in ongoingCollisions:
+                    ongoingCollisions.remove((s1.plane.id, s2.plane.id))
 
-        # pygame.time.delay(250)
+                if 0 < s1.plane.squareDistance(s2.plane) < ALERT_DIST_SQ:
+                    flash(s1, 'ALERT')
+                    flash(s2, 'ALERT')
+                    s1.plane.radarInput.append(s2.plane)
+                    s2.plane.radarInput.append(s1.plane)
+
+        # Planes have reached their destination
+        if frame == SPEED:
+            distanceLost = (1 - math.sqrt((p.destination - p.position) ** 2 / (p.destination - p.origin) ** 2)
+                                for p in (s.plane for s in allsprites))
+            for distance in distanceLost:
+                print '{:.2%}'.format(distance)
+            print 'Total collisions =', collisionCount
+            paused = True
+
 
         pygame.display.flip()
     #Game Over
