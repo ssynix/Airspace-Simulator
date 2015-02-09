@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-11-03 14:31:53
+# @Last Modified time: 2014-11-07 10:43:43
 
 #/usr/bin/env python
 
@@ -29,7 +29,7 @@ COLLISION_DIST_SQ = Plane.COLLISION_DIST_SQ
 ALERT_DIST_SQ = 9 * COLLISION_DIST_SQ
 MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
-NUMBER_OF_PLANES = 12
+NUMBER_OF_PLANES = 15
 SPEED = 300  # Number of frames it takes for each plane to reach its destination
 FRAMERATE = 40
 
@@ -196,15 +196,15 @@ def main():
                 if 0 < s1.plane.squareDistance(s2.plane) < ALERT_DIST_SQ:
                     flash(s1, 'ALERT')
                     flash(s2, 'ALERT')
-                    s1.plane.radarInput.append(s2.plane)
-                    s2.plane.radarInput.append(s1.plane)
+                    s1.plane.radarInput.append(('Plane detected', s2.plane))
+                    s2.plane.radarInput.append(('Plane detected', s1.plane))
 
         # Planes have reached their destination
         if frame == SPEED:
             distanceLost = (1 - math.sqrt((p.destination - p.position) ** 2 / (p.destination - p.origin) ** 2)
                                 for p in (s.plane for s in allsprites))
             for distance in distanceLost:
-                print '{:.2%}'.format(distance)
+                print '{:.1%}'.format(distance)
             print 'Total collisions =', collisionCount
             paused = True
 
