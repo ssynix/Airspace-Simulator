@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2014-11-07 10:43:43
+# @Last Modified time: 2015-02-09 22:43:39
 
 #/usr/bin/env python
 
@@ -30,7 +30,7 @@ ALERT_DIST_SQ = 9 * COLLISION_DIST_SQ
 MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
 NUMBER_OF_PLANES = 15
-SPEED = 300  # Number of frames it takes for each plane to reach its destination
+SPEED = 200  # Number of frames it takes for each plane to reach its destination
 FRAMERATE = 40
 
 #------------ CONSTANTS ------------------#
@@ -68,13 +68,10 @@ def load_sound(name):
 
 #classes for our game objects
 class PlaneSprite(pygame.sprite.Sprite):
-    """moves a clenched fist on the screen, following the mouse"""
-    def __init__(self):
+    def __init__(self, plane):
         pygame.sprite.Sprite.__init__(self) #call Sprite initializer
         self.image, self.rect = load_image('plane_low.png', -1)
-        self.plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
-        # self.plane.setCourse(randint(496, 500), 400, 600, SPEED)
-        self.plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), SPEED)
+        self.plane = plane
 
         self.originalImage = self.image
 
@@ -136,7 +133,24 @@ def main():
 
 #Prepare Game Objects
     clock = pygame.time.Clock()
-    planes = [PlaneSprite() for i in range(NUMBER_OF_PLANES)]
+    planes = []
+    plane = Plane(100, 100, 400)
+    plane.setCourse(400, 400, 600, SPEED)
+    planes.append(plane)
+    plane = Plane(600, 600, 500)
+    plane.setCourse(400, 400, 600, SPEED)
+    planes.append(plane)
+    # plane = Plane(700, 340, 390)
+    # plane.setCourse(400, 400, 600, SPEED)
+    # planes.append(plane)
+
+    planes = [PlaneSprite(p) for p in planes]
+
+    # for i in range(NUMBER_OF_PLANES):
+    #     plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
+    #     # plane.setCourse(randint(496, 500), 400, 600, SPEED)
+    #     plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), SPEED)
+    #     planes.append(PlaneSprite(plane))
     allsprites = pygame.sprite.RenderPlain(planes)
 
     collisionCount = 0
@@ -156,9 +170,11 @@ def main():
             elif event.type == KEYDOWN and event.key == K_ESCAPE:
                 return
             elif event.type == KEYDOWN and event.key == K_SPACE:
+                if not paused:
+                    print 'Total collisions =', collisionCount
                 paused = not paused
         if paused:
-            pygame.time.wait(200)  # Continue pausing until keypress
+            pygame.time.wait(100)  # Continue pausing until keypress
             continue
 
         for sprite in allsprites:

@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
-# @Last Modified by:   Synix
-# @Last Modified time: 2015-02-09 07:57:25
+# @Last Modified by:   Shayan Sayahi
+# @Last Modified time: 2015-02-10 07:39:50
 
 from __future__ import division
 from itertools import product
+from random import randint
 import math
 import numpy
 
@@ -78,12 +79,14 @@ class Plane:
         self.commitments = {}  # commitments[plane] = {'Time Left':, 'Begin':, 'End':}
         self.velocityIntervals = []
         # self.utilityFunction = None
-        self.utilities = {}
+        self.utilities = {}    # Used to keep track of alternate trajectories sent to another plane
+        self.multiwayParties = []
         self.id = Plane.ID
         Plane.ID += 1
 
     def utilityFunction(self, alternate):
-        return 1/(alternate * self.velocity)
+        return (alternate * self.velocity) * (randint(1, 100)/100000 + 1) 
+        # A small noise added to the utility to avoid having trajectories with the exact same utility (could complicate things)
 
     def setCourse(self, x, y, altitude, time):
         self.origin = self.position
@@ -97,7 +100,7 @@ class Plane:
     def generateAlternates(self):
         # Change heading while mainting constant speed
         result = []
-        anglesZ = [-30, 30, 15, -15, 45, -45, 0]  # Rotation around the Z axis
+        anglesZ = [-30, 30, 15, -15, 45, -45, 75, -75, 0]  # Rotation around the Z axis
         for t in map(math.radians, anglesZ):
             rotationMatrix = numpy.array(
                 [[math.cos(t),  -math.sin(t),   0],
@@ -118,11 +121,12 @@ class Plane:
 
         # Process radar input to detect/avoid collisions
         while self.radarInput:
+            # Using pop and insert(0, ) to simulate a queue (yes... it's not OPTIMAL, doesn't matter)
             input = self.radarInput.pop()
             if input[0] == 'Plane detected':
                 other = input[1]
-                if other.id in self.commitments:
-                    continue  # For now don't do anything else if there's already a commitment
+                if other in self.commitments:
+                    continue  # Don't do anything else if there's already a commitment with this plane
 
                 # Math and Physics...
                 delta_position = other.position - self.position
@@ -141,6 +145,7 @@ class Plane:
                         break
                     if begin < 0:  # Currently colliding, any actions must begin from now
                         begin = 0
+
                     self.commitments[other] = {}
                     self.commitments[other]['Time Left'] = 2 * end
                     self.commitments[other]['Begin'] = begin
@@ -156,7 +161,7 @@ class Plane:
                 for (plan1, plan2) in product(self.utilities[other.id], otherUtilities):
                     myDealVelocity = plan1[0]
                     otherDealVelocity = plan2[0]
-                    # Math and Physics...
+                    # Math and Physics... # TODO MAKE DRY
                     delta_position = other.position - self.position
                     delta_velocity = otherDealVelocity - myDealVelocity
 
@@ -167,6 +172,7 @@ class Plane:
                     collisionTimes = numpy.roots([a, b, c])
                     if collisionTimes.size and all(numpy.isreal(collisionTimes)):
                         continue  # Discard a deal in which collision happens
+
                     nashProduct = plan1[1] * plan2[1]
                     if nashProduct > maxNashProduct:
                         maxNashProduct = nashProduct
@@ -176,8 +182,11 @@ class Plane:
                 end   = self.commitments[other]['End']
                 if maxNashDeal:
                     diff = maxNashDeal[0][0] - self.velocity
-                    self.velocityIntervals.append(VelocityInterval(diff, 0, begin, other.id))
-                    self.velocityIntervals.append(VelocityInterval(-diff, end, end + begin, other.id))
+                    self.velocityIntervals.append(VelocityInterval(diff, 0, end, other.id))
+                    self.velocityIntervals.append(VelocityInterval(-diff, end, 2*end, other.id))
+
+            elif input[0] == 'Multiway':
+
 
 
     def flyAway(self):
