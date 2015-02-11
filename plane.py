@@ -3,13 +3,16 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Shayan Sayahi
-# @Last Modified time: 2015-02-10 07:39:50
+# @Last Modified time: 2015-02-11 10:26:47
 
 from __future__ import division
-from itertools import product
-from random import randint
+from functools import reduce
+from itertools import product, combinations
+from operator import mul
+from sets import Set
 import math
 import numpy
+import random
 
 
 class Vector:
@@ -46,6 +49,12 @@ class Vector:
     def squareDistance(self, other):
         return (other - self) ** 2
 
+    def norm(self):
+        return math.sqrt(self ** 2)
+
+    def copy(self):
+        return Vector(self.x, self.y, self.z)
+
     def __repr__(self):
         return "<Vector ({:.2f}, {:.2f}, {:.2f})>".format(*self)
 
@@ -58,7 +67,7 @@ class Vector:
 class VelocityInterval:
     # A velocity vector maintained from 'begin' frames from now till 'end'
     # as a result of a commitment with plane id
-    def __init__(self, velocity, begin, end, id):
+    def __init__(self, velocity, begin, end, id=None):
         self.velocity, self.begin, self.end, self.id = velocity, int(begin), int(end), id
 
     def __repr__(self):
@@ -76,16 +85,17 @@ class Plane:
     def __init__(self, x, y, altitude):
         self.position = Vector(x, y, altitude)
         self.radarInput = []
-        self.commitments = {}  # commitments[plane] = {'Time Left':, 'Begin':, 'End':}
+        self.commitment = {'time': 0, 'offcourse': 0}
         self.velocityIntervals = []
         # self.utilityFunction = None
-        self.utilities = {}    # Used to keep track of alternate trajectories sent to another plane
-        self.multiwayParties = []
+        self.multiwayParties = Set()
+        self.collisionsEnd = Set()
+        self.multiwayUtilities = {}
         self.id = Plane.ID
         Plane.ID += 1
 
     def utilityFunction(self, alternate):
-        return (alternate * self.velocity) * (randint(1, 100)/100000 + 1) 
+        return (alternate * self.velocity) * (random.uniform(.9999, 1.0001))
         # A small noise added to the utility to avoid having trajectories with the exact same utility (could complicate things)
 
     def setCourse(self, x, y, altitude, time):
@@ -93,7 +103,7 @@ class Plane:
         self.destination = Vector(x, y, altitude)
         self.distanceTraveledSq = 0
         self.velocity = (self.destination - self.position) / time
-        self.speedSquared = self.velocity ** 2
+        self.speed = self.velocity.norm()
         self.velocityIntervals = []
         self.velocityIntervals.append(VelocityInterval(self.velocity, 0, 1e6, self.id))
 
@@ -111,82 +121,106 @@ class Plane:
             # TODO 
         return result
 
+    def findCollisionTimes(self, other, delta_velocity=None):
+        # Math and Physics...
+        delta_position = other.position - self.position
+        if not delta_velocity:
+            delta_velocity = other.velocity - self.velocity
+
+        # Coefficients of the square_distance/time quadratic equation
+        a = delta_velocity ** 2
+        b = delta_position * delta_velocity * 2
+        c = delta_position ** 2 - Plane.COLLISION_DIST_SQ
+        return numpy.roots([a, b, c])
+
+    def receive(self, tuple):
+        self.radarInput.insert(0, tuple)
 
     def processRadar(self):
-        # Keep track of commitments
-        for commitment, info in self.commitments.iteritems():
-            if info['Time Left'] == 0:
-                del self.commitments[commitment]
-            self.commitments[commitment]['Time Left'] -= 1
+        if self.commitment['time'] == 0:
+            self.commitment['offcourse'] = Vector(0, 0, 0)
+        else:
+            self.commitment['time'] -= 1
 
-        # Process radar input to detect/avoid collisions
+        # Process radar input in a loop (FIFO)
         while self.radarInput:
             # Using pop and insert(0, ) to simulate a queue (yes... it's not OPTIMAL, doesn't matter)
             input = self.radarInput.pop()
             if input[0] == 'Plane detected':
                 other = input[1]
-                if other in self.commitments:
+                if other in self.multiwayParties:
                     continue  # Don't do anything else if there's already a commitment with this plane
 
-                # Math and Physics...
-                delta_position = other.position - self.position
-                delta_velocity = other.velocity - self.velocity
-
-                # Coefficients of the square_distance/time quadratic equation
-                a = delta_velocity ** 2
-                b = delta_position * delta_velocity * 2
-                c = delta_position ** 2 - Plane.COLLISION_DIST_SQ
-                collisionTimes = numpy.roots([a, b, c])
-
+                collisionTimes = self.findCollisionTimes(other)
                 # Checking that roots exist and are not imaginary, collision happens between two real roots
                 if collisionTimes.size and all(numpy.isreal(collisionTimes)):
-                    begin, end = min(collisionTimes), max(collisionTimes)
-                    if end < 0:  # Collision has happened in the past, no action required
-                        break
-                    if begin < 0:  # Currently colliding, any actions must begin from now
-                        begin = 0
+                    end = max(collisionTimes)
 
-                    self.commitments[other] = {}
-                    self.commitments[other]['Time Left'] = 2 * end
-                    self.commitments[other]['Begin'] = begin
-                    self.commitments[other]['End'] = end
-                    self.utilities[other.id] = [(alt, self.utilityFunction(alt)) for alt in self.generateAlternates()]
-                    other.radarInput.insert(0, ('Alternate Trajectories', self, self.utilities[other.id]))
-
-            elif input[0] == 'Alternate Trajectories':
-                other = input[1]
-                otherUtilities = input[2]
-                maxNashProduct = 0
-                maxNashDeal = None
-                for (plan1, plan2) in product(self.utilities[other.id], otherUtilities):
-                    myDealVelocity = plan1[0]
-                    otherDealVelocity = plan2[0]
-                    # Math and Physics... # TODO MAKE DRY
-                    delta_position = other.position - self.position
-                    delta_velocity = otherDealVelocity - myDealVelocity
-
-                    # Coefficients of the square_distance/time quadratic equation
-                    a = delta_velocity ** 2
-                    b = delta_position * delta_velocity * 2
-                    c = delta_position ** 2 - Plane.COLLISION_DIST_SQ
-                    collisionTimes = numpy.roots([a, b, c])
-                    if collisionTimes.size and all(numpy.isreal(collisionTimes)):
-                        continue  # Discard a deal in which collision happens
-
-                    nashProduct = plan1[1] * plan2[1]
-                    if nashProduct > maxNashProduct:
-                        maxNashProduct = nashProduct
-                        maxNashDeal = (plan1, plan2)
-
-                begin = self.commitments[other]['Begin']
-                end   = self.commitments[other]['End']
-                if maxNashDeal:
-                    diff = maxNashDeal[0][0] - self.velocity
-                    self.velocityIntervals.append(VelocityInterval(diff, 0, end, other.id))
-                    self.velocityIntervals.append(VelocityInterval(-diff, end, 2*end, other.id))
+                    self.multiwayParties.add(self)
+                    self.collisionsEnd.add(end)
+                    other.radarInput.insert(0, ('Multiway', self.multiwayParties.copy(), self.multiwayUtilities.copy(), self.collisionsEnd.copy()))
 
             elif input[0] == 'Multiway':
+                otherParties = input[1]
+                otherUtilities = input[2]
+                otherCollisionTimes = input[3]
 
+                print 'boo' + str(self.id)
+                newParties = otherParties - self.multiwayParties
+                self.multiwayParties.update(otherParties)
+                self.multiwayUtilities.update(otherUtilities)
+                self.collisionsEnd.update(otherCollisionTimes)
+
+                if newParties or self not in self.multiwayUtilities.keys():
+                    self.multiwayUtilities[self] = [(alt, self.utilityFunction(alt)) for alt in self.generateAlternates()]
+                    [plane.radarInput.insert(0, ('Multiway', self.multiwayParties.copy(), self.multiwayUtilities.copy(), self.collisionsEnd.copy()))
+                        for plane in self.multiwayParties if plane != self]
+
+                if self.multiwayParties == Set(self.multiwayUtilities.keys()):
+                    #  (p1, [(v, u)1, (v, u)2, ...]), (p2, [(v, u)3, (v, u)4, ...], ...) -->
+                    # [ (p1, (v,u)1), (p1, vu2), (p2, vu3), (p2, vu4), ...]
+                    planeTrajectories = [map(lambda x: (p,) + (x,), vulist) for (p, vulist) in self.multiwayUtilities.iteritems()]
+                    maxNashProduct = 0
+                    maxNashDeal = None
+
+                    for deal in product(*planeTrajectories):
+                    # deal = ( (plane, plan), ... ), plan = [ (Vector, utility), ... ]
+
+                        goodDeal = True
+                        for (u1, u2) in combinations(deal, 2):
+                            plane1, plan1 = u1
+                            plane2, plan2 = u2
+                            collisionTimes = plane1.findCollisionTimes(plane2, plan2[0] - plan1[0])
+                            if collisionTimes.size and all(numpy.isreal(collisionTimes)):
+                                goodDeal = False
+                                break
+                        if not goodDeal:
+                            continue
+
+                        nashProduct = reduce(mul, (x[1][1] for x in deal))  # x[1] == plan, plan[1] == utility
+                        if nashProduct > maxNashProduct:
+                            maxNashProduct = nashProduct
+                            maxNashDeal = deal
+
+                    if maxNashDeal:
+                        print maxNashDeal, self.velocity
+                        myDealVelocity = next(x[1][0] for x in maxNashDeal if x[0] == self)
+                        origVelocity = self.velocityIntervals[0].velocity
+                        self.velocityIntervals = []
+
+                        end = max(self.collisionsEnd)
+                        self.commitment['time'] = end
+                        self.velocityIntervals.append(VelocityInterval(myDealVelocity, 0, end))
+
+                        offcourse = self.commitment['offcourse'] + myDealVelocity * end
+                        backTime = offcourse.norm() / self.speed
+                        backVelocity = offcourse / backTime
+                        diff = origVelocity - backVelocity
+                        self.velocityIntervals.append(VelocityInterval(origVelocity, end, 1e6))
+                        self.velocityIntervals.append(VelocityInterval(diff, end, end + backTime))
+
+                    self.multiwayUtilities = {}
+                    self.collisionsEnd = Set()
 
 
     def flyAway(self):
@@ -202,12 +236,14 @@ class Plane:
 
         # Maintaining constant speed
         if self.velocity ** 2 != 0:
-            self.velocity *= math.sqrt(self.speedSquared / self.velocity ** 2)
+            self.velocity *= self.speed / self.velocity.norm()
 
         # Flying forward
         self.position += self.velocity
         self.distanceTraveledSq += self.velocity ** 2
 
+        if self.commitment['time'] != 0:
+            self.commitment['offcourse'] += self.velocity
 
     def squareDistance(self, other):
         return self.position.squareDistance(other.position)
@@ -216,7 +252,8 @@ class Plane:
         return int(self.position.x), int(self.position.y)
 
     def __repr__(self):
-        return '<Plane {id=%s, position=%s, velocity=%s}>' % (self.id, self.position, self.velocity)
+        return '<Plane {id=%s}>' % (self.id)
+        # return '<Plane {id=%s, position=%s, velocity=%s}>' % (self.id, self.position, self.velocity)
 
 
 # utility functions; limitations on altitude, speed, heading; speed: 1.5-2.5 knots, 10k-50k feet height, MCP, 
