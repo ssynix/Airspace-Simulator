@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Shayan Sayahi
-# @Last Modified time: 2015-02-11 10:26:47
+# @Last Modified time: 2015-02-11 22:43:19
 
 from __future__ import division
 from functools import reduce
@@ -43,7 +43,7 @@ class Vector:
         elif isinstance(other, Vector): # Dot product
             return sum((self.x * other.x, self.y * other.y, self.z * other.z))
 
-    def __pow__(self, scalar): # Dot product in itself
+    def __pow__(self, scalar):  # Dot product in itself
         return sum((self.x ** scalar, self.y ** scalar, self.z ** scalar))
 
     def squareDistance(self, other):
@@ -110,7 +110,8 @@ class Plane:
     def generateAlternates(self):
         # Change heading while mainting constant speed
         result = []
-        anglesZ = [-30, 30, 15, -15, 45, -45, 75, -75, 0]  # Rotation around the Z axis
+        anglesZ = [-30, 30, 75, -75]  # Rotation around the Z axis
+        # anglesZ = [-30, 30, 15, -15, 45, -45, 75, -75, 0]  # Rotation around the Z axis
         for t in map(math.radians, anglesZ):
             rotationMatrix = numpy.array(
                 [[math.cos(t),  -math.sin(t),   0],
@@ -131,7 +132,12 @@ class Plane:
         a = delta_velocity ** 2
         b = delta_position * delta_velocity * 2
         c = delta_position ** 2 - Plane.COLLISION_DIST_SQ
-        return numpy.roots([a, b, c])
+        d = b*b - 4*a*c
+
+        if d < 0:
+            return None
+        else:
+            return [(-b + math.sqrt(d))/(2*a), (-b - math.sqrt(d))/(2*a)]
 
     def receive(self, tuple):
         self.radarInput.insert(0, tuple)
@@ -139,8 +145,8 @@ class Plane:
     def processRadar(self):
         if self.commitment['time'] == 0:
             self.commitment['offcourse'] = Vector(0, 0, 0)
-        else:
-            self.commitment['time'] -= 1
+            self.multiwayParties = Set()
+        self.commitment['time'] -= 1
 
         # Process radar input in a loop (FIFO)
         while self.radarInput:
@@ -152,8 +158,7 @@ class Plane:
                     continue  # Don't do anything else if there's already a commitment with this plane
 
                 collisionTimes = self.findCollisionTimes(other)
-                # Checking that roots exist and are not imaginary, collision happens between two real roots
-                if collisionTimes.size and all(numpy.isreal(collisionTimes)):
+                if collisionTimes:
                     end = max(collisionTimes)
 
                     self.multiwayParties.add(self)
@@ -165,7 +170,7 @@ class Plane:
                 otherUtilities = input[2]
                 otherCollisionTimes = input[3]
 
-                print 'boo' + str(self.id)
+                # print 'boo' + str(self.id) # DEBUG
                 newParties = otherParties - self.multiwayParties
                 self.multiwayParties.update(otherParties)
                 self.multiwayUtilities.update(otherUtilities)
@@ -191,7 +196,7 @@ class Plane:
                             plane1, plan1 = u1
                             plane2, plan2 = u2
                             collisionTimes = plane1.findCollisionTimes(plane2, plan2[0] - plan1[0])
-                            if collisionTimes.size and all(numpy.isreal(collisionTimes)):
+                            if collisionTimes:
                                 goodDeal = False
                                 break
                         if not goodDeal:
@@ -203,13 +208,13 @@ class Plane:
                             maxNashDeal = deal
 
                     if maxNashDeal:
-                        print maxNashDeal, self.velocity
+                        # print maxNashDeal, self.velocity # DEBUG
                         myDealVelocity = next(x[1][0] for x in maxNashDeal if x[0] == self)
                         origVelocity = self.velocityIntervals[0].velocity
                         self.velocityIntervals = []
 
                         end = max(self.collisionsEnd)
-                        self.commitment['time'] = end
+                        self.commitment['time'] = int(end)
                         self.velocityIntervals.append(VelocityInterval(myDealVelocity, 0, end))
 
                         offcourse = self.commitment['offcourse'] + myDealVelocity * end
