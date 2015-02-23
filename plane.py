@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
-# @Last Modified by:   Shayan Sayahi
-# @Last Modified time: 2015-02-11 22:43:19
+# @Last Modified by:   Synix
+# @Last Modified time: 2015-02-23 10:22:05
 
 from __future__ import division
 from functools import reduce
@@ -55,6 +55,9 @@ class Vector:
     def copy(self):
         return Vector(self.x, self.y, self.z)
 
+    def int2D(self):
+        return int(round(self.x)), int(round(self.y))
+
     def __repr__(self):
         return "<Vector ({:.2f}, {:.2f}, {:.2f})>".format(*self)
 
@@ -68,7 +71,7 @@ class VelocityInterval:
     # A velocity vector maintained from 'begin' frames from now till 'end'
     # as a result of a commitment with plane id
     def __init__(self, velocity, begin, end, id=None):
-        self.velocity, self.begin, self.end, self.id = velocity, int(begin), int(end), id
+        self.velocity, self.begin, self.end, self.id = velocity, int(round(begin)), int(round(end)), id
 
     def __repr__(self):
         return '<Velocity=%s, begin=%s, end=%s, id=%s>' % (self.velocity, self.begin, self.end, self.id)
@@ -78,7 +81,7 @@ class Plane:
     #---------Static Members--------#
     ID = 0
     PLANE_SIZE = 40
-    COLLISION_DIST_SQ = PLANE_SIZE ** 2
+    COLLISION_DIST_SQ = 4* PLANE_SIZE ** 2
 
     #-------------------------------#
 
@@ -189,7 +192,8 @@ class Plane:
                     maxNashDeal = None
 
                     for deal in product(*planeTrajectories):
-                    # deal = ( (plane, plan), ... ), plan = [ (Vector, utility), ... ]
+                    # deal = ( (plane, plan), ... )
+                    # plan = [ (Vector, utility), ... ]
 
                         goodDeal = True
                         for (u1, u2) in combinations(deal, 2):
@@ -214,11 +218,11 @@ class Plane:
                         self.velocityIntervals = []
 
                         end = max(self.collisionsEnd)
-                        self.commitment['time'] = int(end)
+                        self.commitment['time'] = round(end)
                         self.velocityIntervals.append(VelocityInterval(myDealVelocity, 0, end))
 
                         offcourse = self.commitment['offcourse'] + myDealVelocity * end
-                        backTime = offcourse.norm() / self.speed
+                        backTime = round(offcourse.norm() / self.speed)
                         backVelocity = offcourse / backTime
                         diff = origVelocity - backVelocity
                         self.velocityIntervals.append(VelocityInterval(origVelocity, end, 1e6))
@@ -254,7 +258,7 @@ class Plane:
         return self.position.squareDistance(other.position)
 
     def int2Dpos(self):
-        return int(self.position.x), int(self.position.y)
+        return self.position.int2D()
 
     def __repr__(self):
         return '<Plane {id=%s}>' % (self.id)

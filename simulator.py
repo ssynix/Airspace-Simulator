@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
-# @Last Modified by:   Shayan Sayahi
-# @Last Modified time: 2015-02-11 21:24:54
+# @Last Modified by:   Synix
+# @Last Modified time: 2015-02-23 09:14:23
 
 #/usr/bin/env python
 
@@ -26,13 +26,19 @@ if not pygame.image.get_extended():
 
 PLANE_SIZE = Plane.PLANE_SIZE
 COLLISION_DIST_SQ = Plane.COLLISION_DIST_SQ
-ALERT_DIST_SQ = 9 * COLLISION_DIST_SQ
+ALERT_DIST_SQ = 5 * COLLISION_DIST_SQ
 MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
-NUMBER_OF_PLANES = 18
+NUMBER_OF_PLANES = 6
 SPEED = 200  # Number of frames it takes for each plane to reach its destination
 FRAMERATE = 40
-
+#counting losses of separation (one plane entering another's yellow zone), conflicts (start negotiating), change height, constraints
+# means, stdeviation, losses of separation, efficiency, describe parameters (number of planes, utilities, etc) -> table of results -> interpret results (did it show the trend I was looking for) ( t-test, whether the observed difference in means is significantly different, from a pool t test the variance in the data comes from the difference of the populations, variances are additive
+# accuracy of a t test, variance of delta = sum of the variance of populations divided by sqrt(n)
+#kinda like self-contained sections, 1-2 page summaries of each experiment
+# at least 20-30 trials per experiment, more if t-test returns unsignificant
+#look at asterisk in bio paper, significance
+# we hypothesize that efficiency and whatnot increases this much in multiway compared to pairwise
 #------------ CONSTANTS ------------------#
 
 
@@ -133,24 +139,24 @@ def main():
 
 #Prepare Game Objects
     clock = pygame.time.Clock()
-    # planes = []
-    # plane = Plane(100, 100, 400)
-    # plane.setCourse(400, 400, 600, SPEED)
-    # planes.append(plane)
-    # plane = Plane(600, 600, 500)
-    # plane.setCourse(400, 400, 600, SPEED)
-    # planes.append(plane)
-    # plane = Plane(700, 340, 390)
-    # plane.setCourse(400, 400, 600, SPEED)
-    # planes.append(plane)
-    # planes = [PlaneSprite(p) for p in planes]
+    planes = []
+    plane = Plane(100, 100, 400)
+    plane.setCourse(400, 400, 600, SPEED)
+    planes.append(plane)
+    plane = Plane(600, 600, 500)
+    plane.setCourse(400, 400, 600, SPEED)
+    planes.append(plane)
+    plane = Plane(700, 340, 390)
+    plane.setCourse(400, 400, 600, SPEED)
+    planes.append(plane)
+    sprites = [PlaneSprite(p) for p in planes]
 
-    sprites = []
-    for i in range(NUMBER_OF_PLANES):
-        plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
-        # plane.setCourse(randint(496, 500), 400, 600, SPEED)
-        plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), SPEED)
-        sprites.append(PlaneSprite(plane))
+    # sprites = []
+    # for i in range(NUMBER_OF_PLANES):
+    #     plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
+    #     # plane.setCourse(randint(496, 500), 400, 600, SPEED)
+    #     plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), SPEED)
+    #     sprites.append(PlaneSprite(plane))
     allsprites = pygame.sprite.RenderPlain(sprites)
 
     collisionCount = 0
@@ -185,8 +191,9 @@ def main():
         #Draw Everything
         screen.blit(background, (0, 0))
         allsprites.draw(screen)
-        # for (x, y, z) in (sprite.plane.destination for sprite in allsprites):
-        #     pygame.draw.circle(screen, Color('black'), (x, y), 2, 2)
+
+        for p in (sprite.plane for sprite in allsprites):
+            pygame.draw.line(screen, Color('yellow'), p.origin.int2D(), p.destination.int2D(), 1)
 
         def flash(sprite, status):
             if status == 'ALERT':
