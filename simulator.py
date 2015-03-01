@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2015-03-01 16:44:02
+# @Last Modified time: 2015-03-01 16:51:41
 
 #/usr/bin/env python
 
@@ -27,7 +27,7 @@ if not pygame.image.get_extended():
 PLANE_SIZE = Plane.PLANE_SIZE
 COLLISION_DIST_SQ = Plane.COLLISION_DIST_SQ
 SEPARATION_DIST_SQ = Plane.SEPARATION_DIST_SQ
-ALERT_DIST_SQ = 4 * COLLISION_DIST_SQ
+ALERT_DIST_SQ = 4 * SEPARATION_DIST_SQ
 MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
 NUMBER_OF_PLANES = 12
@@ -223,7 +223,7 @@ def main():
 
         def flash(sprite, status):
             if status == 'ALERT':
-                color = Color('blue')
+                color = Color('light blue')
                 radius = int(math.sqrt(ALERT_DIST_SQ)/2)
             elif status == 'COLLISION':
                 color = Color('red')
@@ -248,7 +248,6 @@ def main():
                     ongoingCollisions.remove((s1.plane.id, s2.plane.id))
 
                 if 0 < s1.plane.squareDistance(s2.plane) < SEPARATION_DIST_SQ:
-                    import pdb; pdb.set_trace()
                     flash(s1, 'SEPARATION')
                     flash(s2, 'SEPARATION')
 
@@ -270,6 +269,7 @@ def main():
                                 for p in (s.plane for s in allsprites))
             for distance in distanceLost:
                 print '{:.1%}'.format(distance)
+            print 'Total separations =', separationCount
             print 'Total collisions =', collisionCount
             paused = True
 

@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2015-03-01 16:34:53
+# @Last Modified time: 2015-03-01 17:12:05
 
 from __future__ import division
 from functools import reduce
@@ -147,7 +147,7 @@ class Plane:
             # TODO 
         return result
 
-    def findCollisionTimes(self, other, delta_velocity=None):
+    def findCollisionTimes(self, other, allowedDistance, delta_velocity=None):
         # Math and Physics...
         delta_position = other.position - self.position
         if not delta_velocity:
@@ -156,7 +156,7 @@ class Plane:
         # Coefficients of the square_distance/time quadratic equation
         a = delta_velocity ** 2
         b = delta_position * delta_velocity * 2
-        c = delta_position ** 2 - Plane.SEPARATION_DIST_SQ
+        c = delta_position ** 2 - allowedDistance
         d = b*b - 4*a*c
 
         if d < 0:
@@ -168,6 +168,53 @@ class Plane:
 
     def receive(self, tuple):
         self.radarInput.insert(0, tuple)
+
+    def reachedMultiwayDeal(self, planeTrajectories, allowedDistance):
+        maxNashProduct = 0
+        maxNashDeal = None
+
+        for deal in product(*planeTrajectories):
+        # deal = ( (plane, plan), ... )
+        # plan = [ (Vector, utility), ... ]
+
+            goodDeal = True
+            for (u1, u2) in combinations(deal, 2):
+                plane1, plan1 = u1
+                plane2, plan2 = u2
+                collisionTimes = plane1.findCollisionTimes(plane2, allowedDistance, plan2[0] - plan1[0])
+                if collisionTimes:
+                    goodDeal = False
+                    break
+            if not goodDeal:
+                continue
+
+            nashProduct = reduce(mul, (x[1][1] for x in deal))  # x[1] == plan, plan[1] == utility
+            if nashProduct > maxNashProduct:
+                maxNashProduct = nashProduct
+                maxNashDeal = deal
+
+        if maxNashDeal:
+            myDealVelocity = next(x[1][0] for x in maxNashDeal if x[0] == self)
+            origVelocity = (vi.velocity for vi in self.velocityIntervals if vi.id == self.id).next()
+            self.velocityIntervals = []
+
+            end = max(self.collisionsEnd)
+            self.commitment['time'] = round(end)
+            self.velocityIntervals.append(VelocityInterval(myDealVelocity, 0, end))
+
+            # Find the total distance that the plane has strayed from its original path (sum of all deviations + newly reached deal)
+            # Then calculate the time it takes to correct its course
+            # Imagine the offcourse vector, the original course (origVelocity), and the correction vector (diff) make a triangle, then
+            # the side corresponding to origVelocity is twice the length of offcourse's projection on origVelocity
+
+            offcourse = self.commitment['offcourse'] + myDealVelocity * end
+            backTime = offcourse.norm() / self.speed
+            diff = origVelocity * (origVelocity * offcourse / origVelocity ** 2) * 2 - offcourse
+            diff = diff.normalized() * self.speed
+            self.velocityIntervals.append(VelocityInterval(diff, end, end + backTime, -1))
+            self.velocityIntervals.append(VelocityInterval(origVelocity, end + backTime, 1e6, self.id))
+            return True
+        return False
 
     def processRadar(self):
         self.commitment['time'] -= 1
@@ -183,7 +230,7 @@ class Plane:
                 if other in self.multiwayParties:
                     continue  # Don't do anything else if there's already a commitment with this plane
 
-                collisionTimes = self.findCollisionTimes(other)
+                collisionTimes = self.findCollisionTimes(other, Plane.SEPARATION_DIST_SQ)
                 if collisionTimes:
                     end = max(collisionTimes)
 
@@ -208,58 +255,18 @@ class Plane:
                         for plane in self.multiwayParties if plane != self]
 
                 if self.multiwayParties == Set(self.multiwayUtilities.keys()):
+
                     #  (p1, [(v, u)1, (v, u)2, ...]), (p2, [(v, u)3, (v, u)4, ...], ...) -->
                     #  [ (p1, (v,u)1), (p1, vu2), ...], [(p2, vu3), (p2, vu4), ...]
                     planeTrajectories = [map(lambda x: (p,) + (x,), vulist) for (p, vulist) in self.multiwayUtilities.iteritems()]
-                    maxNashProduct = 0
-                    maxNashDeal = None
 
-                    for deal in product(*planeTrajectories):
-                    # deal = ( (plane, plan), ... )
-                    # plan = [ (Vector, utility), ... ]
-
-                        goodDeal = True
-                        for (u1, u2) in combinations(deal, 2):
-                            plane1, plan1 = u1
-                            plane2, plan2 = u2
-                            collisionTimes = plane1.findCollisionTimes(plane2, plan2[0] - plan1[0])
-                            if collisionTimes:
-                                goodDeal = False
-                                break
-                        if not goodDeal:
-                            continue
-
-                        nashProduct = reduce(mul, (x[1][1] for x in deal))  # x[1] == plan, plan[1] == utility
-                        if nashProduct > maxNashProduct:
-                            maxNashProduct = nashProduct
-                            maxNashDeal = deal
-
-                    if maxNashDeal:
-                        # print maxNashDeal, self.velocity # DEBUG
-                        myDealVelocity = next(x[1][0] for x in maxNashDeal if x[0] == self)
-                        origVelocity = (vi.velocity for vi in self.velocityIntervals if vi.id == self.id).next()
-                        self.velocityIntervals = []
-
-                        end = max(self.collisionsEnd)
-                        self.commitment['time'] = round(end)
-                        self.velocityIntervals.append(VelocityInterval(myDealVelocity, 0, end))
-
-                        # Find the total distance that the plane has strayed from its original path (sum of all deviations + newly reached deal)
-                        # Then calculate the time it takes to correct its course
-                        # Imagine the offcourse vector, the original course (origVelocity), and the correction vector (diff) make a triangle, then
-                        # the side corresponding to origVelocity is twice the length of offcourse's projection on origVelocity
-
-                        offcourse = self.commitment['offcourse'] + myDealVelocity * end
-                        backTime = offcourse.norm() / self.speed
-                        diff = origVelocity * (origVelocity * offcourse / origVelocity ** 2) * 2 - offcourse
-                        diff = diff.normalized() * self.speed
-                        self.velocityIntervals.append(VelocityInterval(diff, end, end + backTime, -1))
-                        self.velocityIntervals.append(VelocityInterval(origVelocity, end + backTime, 1e6, self.id))
-                    else:
-                        # One disadvantage of our approach is that if there is an unresolvable conflict between 2 out of many planes
-                        # in a negotiation, none of them will reach a deal as a result of that conflict
-                        self.commitment['time'] = self.speed
-                        print "No deal found for ", self
+                    if not self.reachedMultiwayDeal(planeTrajectories, Plane.SEPARATION_DIST_SQ):
+                        # Retry while allowing loss of separation to prevent collisions
+                        if not self.reachedMultiwayDeal(planeTrajectories, Plane.COLLISION_DIST_SQ):
+                            # One disadvantage of our approach is that if there is an unresolvable conflict between 2 out of many planes
+                            # in a negotiation, none of them will reach a deal as a result of that conflict
+                            self.commitment['time'] = 80 # Don't retry to make a deal for two seconds (assuming 40 frame/sec)
+                            print "No deal found for ", self
 
                     self.multiwayUtilities = {}
                     self.collisionsEnd = Set()
@@ -300,7 +307,3 @@ class Plane:
     def __repr__(self):
         return '<Plane {id=%s}>' % (self.id)
         # return '<Plane {id=%s, position=%s, velocity=%s}>' % (self.id, self.position, self.velocity)
-
-
-# utility functions; limitations on altitude, speed, heading; speed: 1.5-2.5 knots, 10k-50k feet height, MCP, 
-# empirically measure two things, frequency of loss of separation (compared to uncoordinated), efficiency (fuel loss, increased travel time)
