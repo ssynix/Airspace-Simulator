@@ -3,7 +3,7 @@
 # @Author: Synix
 # @Date:   014-10-01 05:52:51
 # @Last Modified by:   Synix
-# @Last Modified time: 2015-02-23 10:22:05
+# @Last Modified time: 2015-03-01 16:34:53
 
 from __future__ import division
 from functools import reduce
@@ -58,6 +58,12 @@ class Vector:
     def int2D(self):
         return int(round(self.x)), int(round(self.y))
 
+    def normalized(self):
+        return self / self.norm()
+
+    def angle(self, other):
+        return math.acos(self * other / (self.norm() * other.norm()))
+
     def __repr__(self):
         return "<Vector ({:.2f}, {:.2f}, {:.2f})>".format(*self)
 
@@ -81,7 +87,8 @@ class Plane:
     #---------Static Members--------#
     ID = 0
     PLANE_SIZE = 40
-    COLLISION_DIST_SQ = 4* PLANE_SIZE ** 2
+    COLLISION_DIST_SQ = PLANE_SIZE ** 2
+    SEPARATION_DIST_SQ = 4 * COLLISION_DIST_SQ
 
     #-------------------------------#
 
@@ -110,18 +117,33 @@ class Plane:
         self.velocityIntervals = []
         self.velocityIntervals.append(VelocityInterval(self.velocity, 0, 1e6, self.id))
 
-    def generateAlternates(self):
+    def generateAlternatives(self):
         # Change heading while mainting constant speed
         result = []
-        anglesZ = [-30, 30, 75, -75]  # Rotation around the Z axis
-        # anglesZ = [-30, 30, 15, -15, 45, -45, 75, -75, 0]  # Rotation around the Z axis
-        for t in map(math.radians, anglesZ):
+        heading = [-35, 35]  # Rotation around the Z axis
+        anglesZ = [20, -20]
+        # heading = [-30, 30, 15, -15, 45, -45, 75, -75, 0]  # Rotation around the Z axis
+
+        for t in map(math.radians, heading):
             rotationMatrix = numpy.array(
                 [[math.cos(t),  -math.sin(t),   0],
                 [math.sin(t),   math.cos(t),    0],
                 [0,             0,              1]])
             rotated = numpy.dot(rotationMatrix, zip(self.velocity)).reshape(1, 3)
-            result.append(Vector(rotated[0][0], rotated[0][1], rotated[0][2]))
+            result.append(Vector(*rotated[0]))
+
+        for t in map(math.radians, anglesZ):
+            sinTheta = self.velocity.z / self.speed
+            cosTheta = math.sqrt(1 - sinTheta ** 2)
+            t += math.asin(sinTheta)
+            zFactor = math.sin(t) / sinTheta
+            xyFactor = math.sqrt(-(self.velocity.z * zFactor) ** 2 + self.velocity ** 2) / (self.speed * cosTheta)
+            rotationMatrix = numpy.array(
+                [[xyFactor,  0,    0],
+                [0,   xyFactor,    0],
+                [0,   0,     zFactor]])
+            rotated = numpy.dot(rotationMatrix, zip(self.velocity)).reshape(1, 3)
+            result.append(Vector(*rotated[0]))
             # TODO 
         return result
 
@@ -134,22 +156,23 @@ class Plane:
         # Coefficients of the square_distance/time quadratic equation
         a = delta_velocity ** 2
         b = delta_position * delta_velocity * 2
-        c = delta_position ** 2 - Plane.COLLISION_DIST_SQ
+        c = delta_position ** 2 - Plane.SEPARATION_DIST_SQ
         d = b*b - 4*a*c
 
         if d < 0:
             return None
-        else:
-            return [(-b + math.sqrt(d))/(2*a), (-b - math.sqrt(d))/(2*a)]
+        times = [(-b + math.sqrt(d))/(2*a), (-b - math.sqrt(d))/(2*a)]
+        if max(times) > 0:
+            return times
+        return None
 
     def receive(self, tuple):
         self.radarInput.insert(0, tuple)
 
     def processRadar(self):
-        if self.commitment['time'] == 0:
-            self.commitment['offcourse'] = Vector(0, 0, 0)
-            self.multiwayParties = Set()
         self.commitment['time'] -= 1
+        if self.commitment['time'] == 0:
+            self.multiwayParties = Set()
 
         # Process radar input in a loop (FIFO)
         while self.radarInput:
@@ -180,13 +203,13 @@ class Plane:
                 self.collisionsEnd.update(otherCollisionTimes)
 
                 if newParties or self not in self.multiwayUtilities.keys():
-                    self.multiwayUtilities[self] = [(alt, self.utilityFunction(alt)) for alt in self.generateAlternates()]
+                    self.multiwayUtilities[self] = [(alt, self.utilityFunction(alt)) for alt in self.generateAlternatives()]
                     [plane.radarInput.insert(0, ('Multiway', self.multiwayParties.copy(), self.multiwayUtilities.copy(), self.collisionsEnd.copy()))
                         for plane in self.multiwayParties if plane != self]
 
                 if self.multiwayParties == Set(self.multiwayUtilities.keys()):
                     #  (p1, [(v, u)1, (v, u)2, ...]), (p2, [(v, u)3, (v, u)4, ...], ...) -->
-                    # [ (p1, (v,u)1), (p1, vu2), (p2, vu3), (p2, vu4), ...]
+                    #  [ (p1, (v,u)1), (p1, vu2), ...], [(p2, vu3), (p2, vu4), ...]
                     planeTrajectories = [map(lambda x: (p,) + (x,), vulist) for (p, vulist) in self.multiwayUtilities.iteritems()]
                     maxNashProduct = 0
                     maxNashDeal = None
@@ -214,19 +237,29 @@ class Plane:
                     if maxNashDeal:
                         # print maxNashDeal, self.velocity # DEBUG
                         myDealVelocity = next(x[1][0] for x in maxNashDeal if x[0] == self)
-                        origVelocity = self.velocityIntervals[0].velocity
+                        origVelocity = (vi.velocity for vi in self.velocityIntervals if vi.id == self.id).next()
                         self.velocityIntervals = []
 
                         end = max(self.collisionsEnd)
                         self.commitment['time'] = round(end)
                         self.velocityIntervals.append(VelocityInterval(myDealVelocity, 0, end))
 
+                        # Find the total distance that the plane has strayed from its original path (sum of all deviations + newly reached deal)
+                        # Then calculate the time it takes to correct its course
+                        # Imagine the offcourse vector, the original course (origVelocity), and the correction vector (diff) make a triangle, then
+                        # the side corresponding to origVelocity is twice the length of offcourse's projection on origVelocity
+
                         offcourse = self.commitment['offcourse'] + myDealVelocity * end
-                        backTime = round(offcourse.norm() / self.speed)
-                        backVelocity = offcourse / backTime
-                        diff = origVelocity - backVelocity
-                        self.velocityIntervals.append(VelocityInterval(origVelocity, end, 1e6))
-                        self.velocityIntervals.append(VelocityInterval(diff, end, end + backTime))
+                        backTime = offcourse.norm() / self.speed
+                        diff = origVelocity * (origVelocity * offcourse / origVelocity ** 2) * 2 - offcourse
+                        diff = diff.normalized() * self.speed
+                        self.velocityIntervals.append(VelocityInterval(diff, end, end + backTime, -1))
+                        self.velocityIntervals.append(VelocityInterval(origVelocity, end + backTime, 1e6, self.id))
+                    else:
+                        # One disadvantage of our approach is that if there is an unresolvable conflict between 2 out of many planes
+                        # in a negotiation, none of them will reach a deal as a result of that conflict
+                        self.commitment['time'] = self.speed
+                        print "No deal found for ", self
 
                     self.multiwayUtilities = {}
                     self.collisionsEnd = Set()
@@ -240,8 +273,10 @@ class Plane:
                 self.velocity += interval.velocity
             interval.begin -= 1
             interval.end -= 1
-            if interval.end == 0:
-                self.velocityIntervals.remove(interval)
+        self.velocityIntervals = [vi for vi in self.velocityIntervals if vi.end > 0]
+
+        # if self.id == 0: #  DEBUG
+        #     print self.velocityIntervals
 
         # Maintaining constant speed
         if self.velocity ** 2 != 0:
@@ -251,8 +286,10 @@ class Plane:
         self.position += self.velocity
         self.distanceTraveledSq += self.velocity ** 2
 
-        if self.commitment['time'] != 0:
+        if self.commitment['time'] > 0 or any(vi.id == -1 for vi in self.velocityIntervals):
             self.commitment['offcourse'] += self.velocity
+        else:
+            self.commitment['offcourse'] = Vector(0, 0, 0)
 
     def squareDistance(self, other):
         return self.position.squareDistance(other.position)

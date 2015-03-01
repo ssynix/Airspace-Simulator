@@ -2,7 +2,7 @@
 # @Author: Synix
 # @Date:   2014-09-25 09:16:40
 # @Last Modified by:   Synix
-# @Last Modified time: 2015-02-23 09:14:23
+# @Last Modified time: 2015-03-01 16:44:02
 
 #/usr/bin/env python
 
@@ -26,10 +26,11 @@ if not pygame.image.get_extended():
 
 PLANE_SIZE = Plane.PLANE_SIZE
 COLLISION_DIST_SQ = Plane.COLLISION_DIST_SQ
-ALERT_DIST_SQ = 5 * COLLISION_DIST_SQ
+SEPARATION_DIST_SQ = Plane.SEPARATION_DIST_SQ
+ALERT_DIST_SQ = 4 * COLLISION_DIST_SQ
 MIN_ALTITUDE, MAX_ALTITUDE = 300, 600
 DISPLAY_WIDTH, DISPLAY_HEIGHT = 800, 600
-NUMBER_OF_PLANES = 6
+NUMBER_OF_PLANES = 12
 SPEED = 200  # Number of frames it takes for each plane to reach its destination
 FRAMERATE = 40
 #counting losses of separation (one plane entering another's yellow zone), conflicts (start negotiating), change height, constraints
@@ -121,6 +122,13 @@ class PlaneSprite(pygame.sprite.Sprite):
         heightColor.fill((heightToColor, heightToColor, heightToColor))
         self.image.blit(heightColor, (0, 0), None, BLEND_MIN)
 
+        # Plane id text
+        fontsize = int(PLANE_SIZE / 2)
+        font = pygame.font.Font(None, fontsize)
+        textColor = 10
+        text = font.render(str(self.plane.id), True, (textColor, textColor, textColor))
+        self.image.blit(text, (0, 0))
+
 
 def main():
 #Initialize Everything
@@ -140,27 +148,45 @@ def main():
 #Prepare Game Objects
     clock = pygame.time.Clock()
     planes = []
-    plane = Plane(100, 100, 400)
-    plane.setCourse(400, 400, 600, SPEED)
-    planes.append(plane)
-    plane = Plane(600, 600, 500)
-    plane.setCourse(400, 400, 600, SPEED)
-    planes.append(plane)
-    plane = Plane(700, 340, 390)
-    plane.setCourse(400, 400, 600, SPEED)
-    planes.append(plane)
-    sprites = [PlaneSprite(p) for p in planes]
 
-    # sprites = []
-    # for i in range(NUMBER_OF_PLANES):
-    #     plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
-    #     # plane.setCourse(randint(496, 500), 400, 600, SPEED)
-    #     plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), SPEED)
-    #     sprites.append(PlaneSprite(plane))
-    allsprites = pygame.sprite.RenderPlain(sprites)
+    # Head on collision
+    # plane = Plane(0, 300, 400)
+    # plane.setCourse(800, 300, 400, SPEED)
+    # planes.append(plane)
+    # plane = Plane(800, 300, 400)
+    # plane.setCourse(00, 300, 400, SPEED)
+    # planes.append(plane)
+
+    # 3 plane collision
+    # plane = Plane(100, 100, 400)
+    # plane.setCourse(400, 400, 600, SPEED)
+    # planes.append(plane)
+    # plane = Plane(600, 600, 500)
+    # plane.setCourse(400, 400, 600, SPEED)
+    # planes.append(plane)
+    # plane = Plane(700, 340, 390)
+    # plane.setCourse(400, 400, 600, SPEED)
+    # planes.append(plane)
+
+    # Corner Case
+    # plane = Plane(5,332,597); plane.setCourse(229,230,513,SPEED); planes.append(plane);plane = Plane(189,408,429); plane.setCourse(425,551,593,SPEED); planes.append(plane);plane = Plane(382,499,408); plane.setCourse(758,149,586,SPEED); planes.append(plane);plane = Plane(206,63,376); plane.setCourse(249,294,310,SPEED); planes.append(plane);plane = Plane(210,202,560); plane.setCourse(568,274,528,SPEED); planes.append(plane);plane = Plane(377,556,565); plane.setCourse(137,239,378,SPEED); planes.append(plane);plane = Plane(685,65,519); plane.setCourse(200,130,379,SPEED); planes.append(plane);plane = Plane(789,271,347); plane.setCourse(458,58,415,SPEED); planes.append(plane);plane = Plane(615,403,315); plane.setCourse(429,268,327,SPEED); planes.append(plane);plane = Plane(683,545,570); plane.setCourse(120,315,566,SPEED); planes.append(plane);plane = Plane(62,5,578); plane.setCourse(461,259,433,SPEED); planes.append(plane);plane = Plane(394,128,546); plane.setCourse(216,347,346,SPEED); planes.append(plane);
+
+    while True:
+        planes = []
+        Plane.ID = 0
+        for i in range(NUMBER_OF_PLANES):
+            plane = Plane(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE))
+            # plane.setCourse(randint(496, 500), 400, 600, SPEED)
+            plane.setCourse(randint(0, DISPLAY_WIDTH), randint(0, DISPLAY_HEIGHT), randint(MIN_ALTITUDE, MAX_ALTITUDE), SPEED)
+            planes.append(plane)
+        if all(p1.squareDistance(p2) > ALERT_DIST_SQ for (p1, p2) in product(planes, repeat=2) if p1.id < p2.id):
+            break
+    allsprites = pygame.sprite.RenderPlain(PlaneSprite(p) for p in planes)
 
     collisionCount = 0
     ongoingCollisions = []
+    separationCount = 0
+    ongoingSeparations = []
 
 #Main Loop
     paused = False
@@ -197,17 +223,21 @@ def main():
 
         def flash(sprite, status):
             if status == 'ALERT':
-                color = Color('yellow')
+                color = Color('blue')
                 radius = int(math.sqrt(ALERT_DIST_SQ)/2)
             elif status == 'COLLISION':
                 color = Color('red')
                 radius = int(math.sqrt(COLLISION_DIST_SQ)/2)
+            elif status == 'SEPARATION':
+                color = Color('yellow')
+                radius = int(math.sqrt(SEPARATION_DIST_SQ)/2)
             pygame.draw.circle(screen, color, sprite.plane.int2Dpos(), radius, 1)
 
         # Sending radar input to planes and detecting collisions
         for (s1, s2) in product(allsprites, repeat=2):
             if s1.plane.id < s2.plane.id:
                 if 0 < s1.plane.squareDistance(s2.plane) < COLLISION_DIST_SQ:
+                    import pdb; pdb.set_trace()
                     flash(s1, 'COLLISION')
                     flash(s2, 'COLLISION')
 
@@ -216,6 +246,17 @@ def main():
                         ongoingCollisions.append((s1.plane.id, s2.plane.id))
                 elif (s1.plane.id, s2.plane.id) in ongoingCollisions:
                     ongoingCollisions.remove((s1.plane.id, s2.plane.id))
+
+                if 0 < s1.plane.squareDistance(s2.plane) < SEPARATION_DIST_SQ:
+                    import pdb; pdb.set_trace()
+                    flash(s1, 'SEPARATION')
+                    flash(s2, 'SEPARATION')
+
+                    if (s1.plane.id, s2.plane.id) not in ongoingSeparations:
+                        separationCount += 1
+                        ongoingSeparations.append((s1.plane.id, s2.plane.id))
+                elif (s1.plane.id, s2.plane.id) in ongoingSeparations:
+                    ongoingSeparations.remove((s1.plane.id, s2.plane.id))
 
                 if 0 < s1.plane.squareDistance(s2.plane) < ALERT_DIST_SQ:
                     flash(s1, 'ALERT')
